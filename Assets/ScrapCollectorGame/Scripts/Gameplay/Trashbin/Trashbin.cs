@@ -4,31 +4,35 @@ using System.Collections.Generic;
 
 public class Trashbin : MonoBehaviour, IInteractable
 {
-    public bool isChecked { get; private set; } // Flag to check if the trashbin is interactable
-    public string TrashbinName { get; private set; } // Name of the trashbin
-    public GameObject FailInteractIcon; // Icon to show when interaction fails
+    public bool isChecked { get; private set; }
+    public string TrashbinName { get; private set; }
+    public GameObject FailInteractIcon;
+
+    [Header("Stamina Settings")]
+    public float staminaCost = 10f;
+    private ThanhTheLucplayer playerStamina; // tham chiếu player
 
     [Header("Item System")]
-    public ItemData[] itemDataList; // Array các ItemData có thể spawn
-    public GameObject itemPickupPrefab; // Prefab có ItemPickup component (optional)
+    public ItemData[] itemDataList;
+    public GameObject itemPickupPrefab;
 
     [Header("Spawn Settings")]
-    public float spawnChance = 0.8f; // Tỷ lệ % spawn item (0.8 = 80%)
-    public int minItems = 1; // Số lượng item tối thiểu
-    public int maxItems = 3; // Số lượng item tối đa
-    public float spawnRadius = 1.5f; // Bán kính spawn item xung quanh trashbin
-    public Vector3 spawnOffset = Vector3.down; // Offset spawn position
+    public float spawnChance = 0.8f;
+    public int minItems = 1;
+    public int maxItems = 3;
+    public float spawnRadius = 1.5f;
+    public Vector3 spawnOffset = Vector3.down;
 
     [Header("Visual Settings")]
-    public Sprite CheckedBin; // Sprite to show when the trashbin is checked
-    public Sprite UncheckedBin; // Sprite để hiển thị khi trashbin chưa check
+    public Sprite CheckedBin;
+    public Sprite UncheckedBin;
 
     [Header("Reset Settings")]
-    public float resetTime = 60f; // Thời gian reset (60 giây = 1 phút)
-    public bool showResetTimer = true; // Hiển thị timer trong console
+    public float resetTime = 60f;
+    public bool showResetTimer = true;
 
-    private Sprite originalSprite; // Sprite gốc của trashbin
-    private Coroutine resetCoroutine; // Reference đến coroutine reset
+    private Sprite originalSprite;
+    private Coroutine resetCoroutine;
 
     [Header("Music")]
     public AudioManagement audioManagement;
@@ -40,23 +44,23 @@ public class Trashbin : MonoBehaviour, IInteractable
 
     void Start()
     {
-        TrashbinName ??= Global_Helper.GenerateUniqueID(gameObject); // Generate a unique ID for the trashbin if not already set
+        TrashbinName ??= Global_Helper.GenerateUniqueID(gameObject);
 
-        FailInteractIcon.SetActive(false); // Ẩn icon fail lúc đầu
-        // Lưu sprite gốc
+        FailInteractIcon.SetActive(false);
+
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
             originalSprite = spriteRenderer.sprite;
         }
-
-        // Nếu có UncheckedBin sprite thì dùng, không thì dùng originalSprite
         if (UncheckedBin == null)
         {
             UncheckedBin = originalSprite;
         }
 
-        // Validate setup
+        // 🔥 Lấy stamina player 1 lần duy nhất
+        playerStamina = FindFirstObjectByType<ThanhTheLucplayer>();
+
         ValidateItemSetup();
     }
 
@@ -71,15 +75,28 @@ public class Trashbin : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (!CanInteract()) return;
-        CheckTrashbin(); // Check the trashbin if interaction is allowed
+
+        // Trừ thể lực
+        if (playerStamina != null)
+        {
+            playerStamina.TruTheLuc(staminaCost);
+        }
+
+        CheckTrashbin();
     }
 
     public bool CanInteract()
     {
-        // Logic to determine if the trashbin can be interacted with
-        return !isChecked;
-    }
+        if (isChecked) return false;
 
+        if (playerStamina != null && playerStamina.luongtheluchientai < staminaCost)
+        {
+            Debug.Log("Không đủ thể lực để nhặt trashbin!");
+            return false;
+        }
+
+        return true;
+    }
     private void CheckTrashbin()
     {
         SetChecked(true);// Set the trashbin as checked
