@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
+  m_Name: "Chai n\u01B0\u1EDBc gi\u1EB7t l\u1EDBn"
+  m_EditorClassIdentifier: 
+  itemName: "Chai n\u01B0\u1EDBc gi\u1EB7t l\u1EDBn"
+  description: Item description
+  itemIcon: {fileID: -8075080999890912046, guid: f6ce26b80373cf2498c0918d68313bd3, type: 3}
+  itemID: 2
+  rarity: 0
+  dropRate: 50
+  minDropAmount: 1
+  maxDropAmount: 1
+  baseSellPrice: 10
+  baseBuyPrice: 5
+  canSell: 1
+  isStackable: 1
+  maxStackSize: 30
+  pickupDelay: 999

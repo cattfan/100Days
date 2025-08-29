@@ -15,6 +15,8 @@ public class AudioManagement : MonoBehaviour
     public AudioClip ButtonClick;
     public AudioClip OpenMenu;
     public AudioClip CloseMenu;
+    public AudioClip DropItem;
+    public AudioClip PlaceItem;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
