@@ -2,11 +2,12 @@
 
 public class PlayerItemCollector : MonoBehaviour
 {
-    //Private InventoryController inventoryController;
+    private InventoryController inventoryController;
 
+    [System.Obsolete]
     void Start()
     {
-        //inventoryController = FindObjectOfType<InventoryController>();
+        inventoryController = FindObjectOfType<InventoryController>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -38,7 +39,7 @@ public class PlayerItemCollector : MonoBehaviour
                         }
 
                         // Add the item to the inventory
-                        // inventoryController.AddItem(itemData, currentAmount);
+                        inventoryController.AddItem(itemData, currentAmount);
 
                         // Debug log để kiểm tra
                         Debug.Log($"Đã thu thập: {itemData.itemName} x{currentAmount} (ID: {itemData.itemID})");

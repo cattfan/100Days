@@ -2,9 +2,15 @@
 using UnityEngine.EventSystems;
 
 // Slot.cs: Xử lý hành vi thả của vật phẩm
-public class Slot : MonoBehaviour, IDropHandler
+public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public GameObject currentItem;
+    private InventoryController inventoryController;
+
+    private void Start()
+    {
+        inventoryController = FindObjectOfType<InventoryController>();
+    }
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -78,4 +84,12 @@ public class Slot : MonoBehaviour, IDropHandler
             }
         }
     }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (inventoryController != null)
+        {
+            inventoryController.HandleSlotClick(this, eventData.button);
+        }
+    }
+
 }
