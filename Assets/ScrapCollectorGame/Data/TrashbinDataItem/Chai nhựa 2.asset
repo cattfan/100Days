@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c58aeb722da17434783882035290b8d0, type: 3}
+  m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
   m_Name: "Chai nh\u1EF1a 2"
   m_EditorClassIdentifier: 
-  itemName: New Item
+  itemName: "Chai n\u01B0\u1EDBc gi\u1EB7t l\u1EDBn"
   description: Item description
   itemIcon: {fileID: -8075080999890912046, guid: f6ce26b80373cf2498c0918d68313bd3, type: 3}
-  itemID: 0
+  itemID: 2
   rarity: 0
   dropRate: 50
   minDropAmount: 1
@@ -23,6 +23,6 @@ MonoBehaviour:
   baseSellPrice: 10
   baseBuyPrice: 5
   canSell: 1
-  isStackable: 0
-  maxStackSize: 1
-  pickupDelay: 20
+  isStackable: 1
+  maxStackSize: 30
+  pickupDelay: 999

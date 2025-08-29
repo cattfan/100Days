@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿// ItemPickup.cs: Xử lý việc nhặt vật phẩm trên thế giới
 using System.Collections;
+using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
 {
@@ -9,8 +10,8 @@ public class ItemPickup : MonoBehaviour
     [Header("Current State")]
     public int currentAmount = 1;
 
-    private bool canBePickedUp = false;     // Flag kiểm tra có thể pickup không
-    private float spawnTime;                // Thời gian item được spawn
+    private bool canBePickedUp = false;      // Flag kiểm tra có thể pickup không
+    private float spawnTime;                 // Thời gian item được spawn
 
     // Public method để kiểm tra có thể pickup không
     public bool CanBePickedUp()
@@ -269,14 +270,10 @@ public class ItemPickup : MonoBehaviour
 
         Debug.Log($"Player đã pickup {itemData.itemName} x{currentAmount}!");
 
-        // 🎯 HIỂN THỊ POPUP UI
+        // Hiển thị popup UI
         if (ItemPickupUIController.Instance != null)
         {
             ItemPickupUIController.Instance.ShowItemPickup(itemData.itemName, itemData.itemIcon);
-        }
-        else
-        {
-            Debug.LogWarning("ItemPickupUIController.Instance not found!");
         }
 
         // Play pickup sound
@@ -285,11 +282,21 @@ public class ItemPickup : MonoBehaviour
             audioManagement.PlaySFX(audioManagement.PickupItem);
         }
 
-        // Thêm item vào inventory của player (cần implement)
+        // ✅ Thêm vào inventory
+        InventoryController inv = FindObjectOfType<InventoryController>();
+        if (inv != null)
+        {
+            inv.AddItem(itemData, currentAmount);
+        }
+        else
+        {
+            Debug.LogWarning("InventoryController not found!");
+        }
 
-            // Nếu không có inventory system, chỉ destroy item
-            Destroy(gameObject);
+        // Xóa object item ngoài world
+        Destroy(gameObject);
     }
+
 
     // Phương thức set item data (để dùng khi spawn item)
     public void SetItemData(ItemData data, int amount = 1)
