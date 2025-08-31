@@ -5,10 +5,7 @@ using TMPro;
 
 public class ShopUIController : MonoBehaviour
 {
-    // Biến này nhận dữ liệu từ NPC
     private ShopData shopData;
-
-    // Public list để kéo 7 ô vật phẩm đã có sẵn vào
     public List<ItemSlotUI> itemSlots;
 
     public void SetShopData(ShopData data)
@@ -19,14 +16,12 @@ public class ShopUIController : MonoBehaviour
 
     public void LoadShopItems()
     {
-        // Vô hiệu hóa tất cả các ô vật phẩm trước
         foreach (var slot in itemSlots)
         {
             if (slot != null)
                 slot.gameObject.SetActive(false);
         }
 
-        // Gán dữ liệu và bật các ô vật phẩm cần thiết
         if (shopData != null && itemSlots != null)
         {
             for (int i = 0; i < shopData.shopItems.Count && i < itemSlots.Count; i++)
@@ -36,9 +31,10 @@ public class ShopUIController : MonoBehaviour
 
                 if (itemSlotUI != null)
                 {
-                    itemSlotUI.gameObject.SetActive(true); // Bật ô vật phẩm lên
-                    itemSlotUI.itemData = item; // Gán dữ liệu vật phẩm
-                    itemSlotUI.UpdateUI(); // Cập nhật UI
+                    itemSlotUI.gameObject.SetActive(true);
+                    itemSlotUI.itemData = item;
+                    // Gọi hàm UpdateUI để hiển thị dữ liệu mới
+                    itemSlotUI.UpdateUI();
                 }
             }
         }

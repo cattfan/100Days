@@ -9,10 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f8edb3cc9c45942a7a3abf787cf010, type: 3}
-  m_Name: "B\xE1nh m\xEC"
+  m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
+  m_Name: "B\xE1nh m\xEC data"
   m_EditorClassIdentifier: 
   itemName: "B\xE1nh m\xEC"
+  description: "B\xE1nh M\xEC\n"
   itemIcon: {fileID: -6789640289551466646, guid: f4a7f70522197d24dad4866e813c93d0, type: 3}
-  itemCost: 25
-  itemData: {fileID: 11400000, guid: 9e456ce34fac86e4b879a7011e7f6a48, type: 2}
+  itemID: 17
+  rarity: 0
+  dropRate: 50
+  minDropAmount: 1
+  maxDropAmount: 1
+  baseSellPrice: 10
+  baseBuyPrice: 5
+  canSell: 0
+  isStackable: 0
+  maxStackSize: 1
+  pickupDelay: 999

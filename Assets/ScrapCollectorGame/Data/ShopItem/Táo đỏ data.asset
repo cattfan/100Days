@@ -9,10 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f8edb3cc9c45942a7a3abf787cf010, type: 3}
-  m_Name: "T\xE1o \u0111\u1ECF"
+  m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
+  m_Name: "T\xE1o \u0111\u1ECF data"
   m_EditorClassIdentifier: 
   itemName: "T\xE1o \u0111\u1ECF"
+  description: "T\xE1o \u0111\u1ECF"
   itemIcon: {fileID: -9213056636207805707, guid: 17147171d53794443adec46db735f571, type: 3}
-  itemCost: 25
-  itemData: {fileID: 11400000, guid: 524f4f60cc1fb044cb76a12a68430e13, type: 2}
+  itemID: 16
+  rarity: 0
+  dropRate: 50
+  minDropAmount: 1
+  maxDropAmount: 1
+  baseSellPrice: 10
+  baseBuyPrice: 5
+  canSell: 0
+  isStackable: 0
+  maxStackSize: 1
+  pickupDelay: 999

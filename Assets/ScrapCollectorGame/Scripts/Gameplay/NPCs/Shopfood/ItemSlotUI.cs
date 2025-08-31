@@ -8,12 +8,12 @@ public class ItemSlotUI : MonoBehaviour
     public Image itemIconImage;
     public TextMeshProUGUI itemNameText;
 
-    private PlayerInventory playerInventory;
+    private ShopManager shopManager;
 
     void Start()
     {
         // Thay thế FindObjectOfType bằng FindAnyObjectByType
-        playerInventory = FindAnyObjectByType<PlayerInventory>();
+        shopManager = FindAnyObjectByType<ShopManager>();
         UpdateUI();
     }
 
@@ -27,17 +27,17 @@ public class ItemSlotUI : MonoBehaviour
             }
             if (itemNameText != null)
             {
-                itemNameText.text = $"{itemData.itemName} - {itemData.itemCost}$";
+                // Chỉ hiển thị tên vật phẩm, loại bỏ giá tiền và dấu gạch ngang
+                itemNameText.text = itemData.itemName;
             }
         }
     }
 
-    // HÀM NÀY SẼ ĐƯỢC GỌI KHI NGƯỜI CHƠI NHẤN VÀO Ô VẬT PHẨM
     public void OnItemClick()
     {
-        if (itemData != null && playerInventory != null)
+        if (itemData != null && shopManager != null)
         {
-            playerInventory.BuyItem(itemData);
+            shopManager.BuyItem(itemData);
         }
     }
 }

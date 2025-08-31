@@ -9,10 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f8edb3cc9c45942a7a3abf787cf010, type: 3}
-  m_Name: "Canh Th\u1ECBt"
+  m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
+  m_Name: "Canh th\u1ECB data"
   m_EditorClassIdentifier: 
   itemName: "Canh Th\u1ECBt"
+  description: "Canh Th\u1ECBt\n"
   itemIcon: {fileID: -4909791101333961716, guid: 188bb298abdf1a34e902ea791385e152, type: 3}
-  itemCost: 25
-  itemData: {fileID: 11400000, guid: 8face73fc69089643852a027c7760d6b, type: 2}
+  itemID: 21
+  rarity: 0
+  dropRate: 50
+  minDropAmount: 1
+  maxDropAmount: 1
+  baseSellPrice: 10
+  baseBuyPrice: 5
+  canSell: 0
+  isStackable: 0
+  maxStackSize: 1
+  pickupDelay: 999

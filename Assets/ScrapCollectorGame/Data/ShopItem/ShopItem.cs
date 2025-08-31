@@ -6,4 +6,5 @@ public class ShopItem : ScriptableObject
     public string itemName;
     public Sprite itemIcon;
     public int itemCost;
+    public ItemData itemData; // Cần có dòng này
 }
