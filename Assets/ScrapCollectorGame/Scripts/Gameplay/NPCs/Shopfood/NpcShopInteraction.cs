@@ -2,6 +2,8 @@
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 public class NpcShopInteraction : MonoBehaviour
 {
@@ -9,11 +11,19 @@ public class NpcShopInteraction : MonoBehaviour
     private InputAction interactAction;
     private bool isShopOpen = false;
     public string shopSceneName = "Shop";
+    public ShopData shopItemsData;
+
+    private EventSystem mainEventSystem;
+    private PlayerInput playerInput;
 
     private void Awake()
     {
         interactAction = new InputAction(binding: "<Keyboard>/e");
         interactAction.performed += OnInteract;
+
+        // Thay thế FindObjectOfType bằng FindAnyObjectByType
+        mainEventSystem = FindAnyObjectByType<EventSystem>();
+        playerInput = FindAnyObjectByType<PlayerInput>();
     }
 
     private void OnEnable()
@@ -33,19 +43,26 @@ public class NpcShopInteraction : MonoBehaviour
         {
             if (!isShopOpen)
             {
-                // Tải scene shop lên khi chưa mở
-                StartCoroutine(LoadAndEnableShop());
+                StartCoroutine(LoadAndOpenShop());
             }
             else
             {
-                // Dỡ scene shop khi đã mở
                 UnloadShopScene();
             }
         }
     }
 
-    IEnumerator LoadAndEnableShop()
+    IEnumerator LoadAndOpenShop()
     {
+        if (playerInput != null)
+        {
+            playerInput.enabled = false;
+        }
+        if (mainEventSystem != null)
+        {
+            mainEventSystem.gameObject.SetActive(false);
+        }
+
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(shopSceneName, LoadSceneMode.Additive);
         while (!asyncLoad.isDone)
         {
@@ -58,16 +75,30 @@ public class NpcShopInteraction : MonoBehaviour
             GameObject[] rootObjects = shopScene.GetRootGameObjects();
             foreach (GameObject obj in rootObjects)
             {
-                if (obj.GetComponent<Canvas>() != null)
+                ShopUIController shopUIController = obj.GetComponentInChildren<ShopUIController>();
+                if (shopUIController != null)
                 {
-                    // Bật Canvas
+                    shopUIController.SetShopData(shopItemsData);
                     obj.SetActive(true);
-
-                    // Đặt vị trí của Rect Transform về 0 để Canvas hiển thị ở trung tâm màn hình
                     RectTransform rectTransform = obj.GetComponent<RectTransform>();
                     if (rectTransform != null)
                     {
                         rectTransform.anchoredPosition3D = Vector3.zero;
+                    }
+
+                    // Tìm EventSystem của scene shop
+                    EventSystem shopEventSystem = obj.GetComponentInChildren<EventSystem>();
+                    if (shopEventSystem == null)
+                    {
+                        GameObject eventSystemObj = new GameObject("EventSystem");
+                        eventSystemObj.AddComponent<EventSystem>();
+                        eventSystemObj.AddComponent<InputSystemUIInputModule>();
+                        eventSystemObj.transform.SetParent(obj.transform);
+                        shopEventSystem = eventSystemObj.GetComponent<EventSystem>();
+                    }
+                    if (shopEventSystem != null)
+                    {
+                        shopEventSystem.gameObject.SetActive(true);
                     }
 
                     break;
@@ -81,6 +112,15 @@ public class NpcShopInteraction : MonoBehaviour
     {
         SceneManager.UnloadSceneAsync(shopSceneName);
         isShopOpen = false;
+
+        if (playerInput != null)
+        {
+            playerInput.enabled = true;
+        }
+        if (mainEventSystem != null)
+        {
+            mainEventSystem.gameObject.SetActive(true);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
