@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0f8edb3cc9c45942a7a3abf787cf010, type: 3}
+  m_Name: "Canh Th\u1ECBt"
+  m_EditorClassIdentifier: 
+  itemName: "Canh Th\u1ECBt"
+  itemIcon: {fileID: -4909791101333961716, guid: 188bb298abdf1a34e902ea791385e152, type: 3}
+  itemCost: 25
+  itemData: {fileID: 11400000, guid: 8face73fc69089643852a027c7760d6b, type: 2}

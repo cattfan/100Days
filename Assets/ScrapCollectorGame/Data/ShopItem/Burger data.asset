@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
+  m_Name: Burger data
+  m_EditorClassIdentifier: 
+  itemName: Burger
+  description: Burger
+  itemIcon: {fileID: 6234330970754847308, guid: 083959b1123d8424f9ff587484ab2cf9, type: 3}
+  itemID: 22
+  rarity: 0
+  dropRate: 50
+  minDropAmount: 1
+  maxDropAmount: 1
+  baseSellPrice: 10
+  baseBuyPrice: 5
+  canSell: 0
+  isStackable: 1
+  maxStackSize: 1
+  pickupDelay: 999

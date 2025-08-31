@@ -1,29 +1,38 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem; // Dùng Input System mới
+using UnityEngine.InputSystem;
 using TMPro;
 
 public class CurrencyManager : MonoBehaviour
 {
     public TMP_Text coinText;
-    private int coins = 0;
+    private int coins = 0; // Biến coins đã là private
+
+    // Thêm hàm public để lấy giá trị của biến coins
+    public int GetCoins()
+    {
+        return coins;
+    }
 
     void Start()
     {
         UpdateCoinText();
     }
 
-    void Update()
+ 
+   void Update()
     {
-        // Test: nhấn phím B để cộng 10 xu
-        if (Keyboard.current.qKey.wasPressedThisFrame)
+        // Test tăng tiền khi nhấn phím T
+        if (Keyboard.current.tKey.wasPressedThisFrame)
         {
-            AddCoins(10);
+            AddCoins(10); // tăng 10 coins
+            Debug.Log("Đã thêm 10 coins");
         }
 
-        // Test: nhấn phím N để trừ 5 xu
-        if (Keyboard.current.eKey.wasPressedThisFrame)
+        // Test giảm tiền khi nhấn phím G
+        if (Keyboard.current.gKey.wasPressedThisFrame)
         {
-            SpendCoins(5);
+            SpendCoins(5); // giảm 5 coins
+            Debug.Log("Đã trừ 5 coins");
         }
     }
 
@@ -39,6 +48,10 @@ public class CurrencyManager : MonoBehaviour
         {
             coins -= amount;
             UpdateCoinText();
+        }
+        else
+        {
+            Debug.Log("Không đủ tiền để mua!");
         }
     }
 

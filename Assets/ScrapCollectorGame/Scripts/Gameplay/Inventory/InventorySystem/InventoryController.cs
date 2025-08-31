@@ -13,7 +13,7 @@ public class InventoryController : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;       // Prefab UI Slot (có script Slot)
     [SerializeField] private GameObject itemUIPrefab;     // Prefab UI Item (có script ItemUI)
     [SerializeField] private int slotCount = 18;
-    
+
 
     [Header("Start Items (optional)")]
     public ItemData[] startItems; // Kéo các ItemData bạn muốn thấy ngay khi chạy
@@ -35,7 +35,6 @@ public class InventoryController : MonoBehaviour
     {
         BuildSlots();
 
-        // Đổ sẵn các item trong danh sách khởi tạo
         if (startItems != null && startItems.Length > 0)
         {
             foreach (var data in startItems)
@@ -61,7 +60,6 @@ public class InventoryController : MonoBehaviour
 
     private void BuildSlots()
     {
-        // Xoá con cũ và danh sách cũ
         foreach (Transform c in inventoryPanel) Destroy(c.gameObject);
         slots.Clear();
 
@@ -77,7 +75,13 @@ public class InventoryController : MonoBehaviour
 
     public bool AddItem(ItemData data, int amount = 1)
     {
-        if (data == null) return false;
+        if (data == null)
+        {
+            Debug.LogError("AddItem: Dữ liệu vật phẩm bị null!");
+            return false;
+        }
+
+        Debug.Log("AddItem: Đang cố gắng thêm vật phẩm " + data.name);
 
         // Nếu stackable → cộng vào slot đang có cùng ItemData
         if (data.isStackable)
@@ -90,6 +94,7 @@ public class InventoryController : MonoBehaviour
                     if (ui != null && ui.GetItemData() == data)
                     {
                         ui.AddAmount(amount);
+                        Debug.Log("AddItem: Cộng thêm vào vật phẩm đã tồn tại.");
                         return true;
                     }
                 }
@@ -105,6 +110,13 @@ public class InventoryController : MonoBehaviour
             return false;
         }
 
+        // Kiểm tra xem itemUIPrefab có được gán không
+        if (itemUIPrefab == null)
+        {
+            Debug.LogError("AddItem: itemUIPrefab chưa được gán!");
+            return false;
+        }
+
         // Tạo UI item
         var itemGO = Instantiate(itemUIPrefab, emptySlot.transform);
         var rt = itemGO.GetComponent<RectTransform>();
@@ -116,10 +128,11 @@ public class InventoryController : MonoBehaviour
         uiComp.Setup(data, amount);
         emptySlot.currentItem = itemGO;
 
-        // Thêm dữ liệu vào danh sách
-        inventoryData.Add(data);
+        inventoryData.Add(data); // Thêm dữ liệu vào danh sách
+        Debug.Log("AddItem: Đã thêm vật phẩm mới vào slot trống.");
         return true;
     }
+
     public void HandleSlotClick(Slot slot, PointerEventData.InputButton button)
     {
         if (button == PointerEventData.InputButton.Left)
@@ -213,23 +226,10 @@ public class InventoryController : MonoBehaviour
                 cursorItem.AddAmount(-1);
                 if (cursorItem.Amount <= 0) { Destroy(cursorItem.gameObject); cursorItem = null; }
             }
-            else
-            {
-                var slotUI = slot.currentItem.GetComponent<ItemUI>();
-                if (slotUI.GetItemData() == cursorItem.GetItemData() && slotUI.GetItemData().isStackable)
-                {
-                    slotUI.AddAmount(1);
-                    cursorItem.AddAmount(-1);
-                    if (cursorItem.Amount <= 0) { Destroy(cursorItem.gameObject); cursorItem = null; }
-                }
-            }
         }
     }
     public RectTransform GetInventoryPanel()
     {
         return inventoryPanel;
     }
-
-
-
 }
