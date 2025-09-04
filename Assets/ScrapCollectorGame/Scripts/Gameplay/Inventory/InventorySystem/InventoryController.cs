@@ -5,24 +5,22 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-// InventoryController.cs: Quản lý logic toàn bộ túi đồ
 public class InventoryController : MonoBehaviour
 {
     [Header("Inventory Setup")]
-    [SerializeField] private RectTransform inventoryPanel; // Panel UI có GridLayoutGroup
-    [SerializeField] private GameObject slotPrefab;       // Prefab UI Slot (có script Slot)
-    [SerializeField] private GameObject itemUIPrefab;     // Prefab UI Item (có script ItemUI)
+    [SerializeField] public RectTransform inventoryPanel;
+    [SerializeField] private GameObject slotPrefab;
+    [SerializeField] private GameObject itemUIPrefab;
     [SerializeField] private int slotCount = 18;
 
 
     [Header("Start Items (optional)")]
-    public ItemData[] startItems; // Kéo các ItemData bạn muốn thấy ngay khi chạy
+    public ItemData[] startItems;
 
-    // Thêm danh sách này để quản lý dữ liệu vật phẩm thực sự
-    private List<ItemData> inventoryData = new List<ItemData>();
     private List<Slot> slots = new List<Slot>();
     private ItemUI cursorItem;
     private float lastClickTime = 0f;
+    public bool shopMode = false; // <- flag shop mode
 
     private void Awake()
     {
@@ -49,7 +47,7 @@ public class InventoryController : MonoBehaviour
         {
             Vector2 pos;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                inventoryPanel.root as RectTransform, // root canvas
+                inventoryPanel.root as RectTransform,
                 Mouse.current.position.ReadValue(),
                 null,
                 out pos
@@ -68,7 +66,7 @@ public class InventoryController : MonoBehaviour
             var go = Instantiate(slotPrefab, inventoryPanel);
             var slotComponent = go.GetComponent<Slot>();
             if (!slotComponent)
-                Debug.LogError("slotPrefab phải có component Slot!");
+                Debug.LogError("slotPrefab must have a Slot component!");
             slots.Add(slotComponent);
         }
     }
@@ -77,13 +75,12 @@ public class InventoryController : MonoBehaviour
     {
         if (data == null)
         {
-            Debug.LogError("AddItem: Dữ liệu vật phẩm bị null!");
+            Debug.LogError("AddItem: Item data is null!");
             return false;
         }
 
-        Debug.Log("AddItem: Đang cố gắng thêm vật phẩm " + data.name);
+        Debug.Log("AddItem: Attempting to add item " + data.name);
 
-        // Nếu stackable → cộng vào slot đang có cùng ItemData
         if (data.isStackable)
         {
             foreach (var s in slots)
@@ -94,14 +91,13 @@ public class InventoryController : MonoBehaviour
                     if (ui != null && ui.GetItemData() == data)
                     {
                         ui.AddAmount(amount);
-                        Debug.Log("AddItem: Cộng thêm vào vật phẩm đã tồn tại.");
+                        Debug.Log("AddItem: Added to existing stack.");
                         return true;
                     }
                 }
             }
         }
 
-        // Tìm slot trống
         var emptySlot = slots.FirstOrDefault(s => s.currentItem == null);
 
         if (emptySlot == null)
@@ -110,14 +106,12 @@ public class InventoryController : MonoBehaviour
             return false;
         }
 
-        // Kiểm tra xem itemUIPrefab có được gán không
         if (itemUIPrefab == null)
         {
-            Debug.LogError("AddItem: itemUIPrefab chưa được gán!");
+            Debug.LogError("AddItem: itemUIPrefab not assigned!");
             return false;
         }
 
-        // Tạo UI item
         var itemGO = Instantiate(itemUIPrefab, emptySlot.transform);
         var rt = itemGO.GetComponent<RectTransform>();
         if (rt != null) { rt.anchoredPosition = Vector2.zero; rt.localScale = Vector3.one; }
@@ -127,10 +121,40 @@ public class InventoryController : MonoBehaviour
 
         uiComp.Setup(data, amount);
         emptySlot.currentItem = itemGO;
-
-        inventoryData.Add(data); // Thêm dữ liệu vào danh sách
-        Debug.Log("AddItem: Đã thêm vật phẩm mới vào slot trống.");
+        Debug.Log("AddItem: Added new item to empty slot.");
         return true;
+    }
+
+    public void RemoveItem(ItemData data, int amount)
+    {
+        // Find the first slot with the item
+        var slotToRemoveFrom = slots.FirstOrDefault(s => s.currentItem != null && s.currentItem.GetComponent<ItemUI>().GetItemData() == data);
+
+        if (slotToRemoveFrom != null)
+        {
+            var itemUI = slotToRemoveFrom.currentItem.GetComponent<ItemUI>();
+            itemUI.AddAmount(-amount);
+
+            if (itemUI.Amount <= 0)
+            {
+                Destroy(slotToRemoveFrom.currentItem);
+                slotToRemoveFrom.currentItem = null;
+            }
+        }
+    }
+
+    // New public method to remove an item by slot index
+    public void RemoveItemAtSlot(int index)
+    {
+        if (index >= 0 && index < slots.Count)
+        {
+            var slot = slots[index];
+            if (slot.currentItem != null)
+            {
+                Destroy(slot.currentItem);
+                slot.currentItem = null;
+            }
+        }
     }
 
     public void HandleSlotClick(Slot slot, PointerEventData.InputButton button)
@@ -147,7 +171,7 @@ public class InventoryController : MonoBehaviour
 
     private void HandleLeftClick(Slot slot)
     {
-        if (cursorItem == null) // tay trống
+        if (cursorItem == null)
         {
             if (slot.currentItem != null)
             {
@@ -156,7 +180,7 @@ public class InventoryController : MonoBehaviour
                 slot.currentItem = null;
             }
         }
-        else // đang cầm item
+        else
         {
             if (slot.currentItem == null)
             {
@@ -177,7 +201,6 @@ public class InventoryController : MonoBehaviour
                 }
                 else
                 {
-                    // Swap
                     var temp = slot.currentItem;
                     slot.currentItem = cursorItem.gameObject;
 
@@ -228,8 +251,37 @@ public class InventoryController : MonoBehaviour
             }
         }
     }
+
+    public List<Slot> GetSlots()
+    {
+        return slots;
+    }
+
     public RectTransform GetInventoryPanel()
     {
         return inventoryPanel;
     }
+    public void OnSlotClicked(Slot slot)
+    {
+        if (slot == null || slot.currentItem == null) return;
+
+        var itemUI = slot.currentItem.GetComponent<ItemUI>();
+        if (itemUI == null) return;
+
+        if (shopMode)
+        {
+            var shopUI = FindFirstObjectByType<ShopUIManager>();
+            if (shopUI != null)
+            {
+                int slotIndex = GetSlots().IndexOf(slot);
+                shopUI.ShowConfirmation(itemUI.GetItemData(), itemUI.Amount, slotIndex);
+            }
+        }
+        else
+        {
+            // luôn coi như Left click
+            HandleSlotClick(slot, PointerEventData.InputButton.Left);
+        }
+    }
+
 }

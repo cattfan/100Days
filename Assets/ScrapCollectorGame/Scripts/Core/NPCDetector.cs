@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class NPCDetector : MonoBehaviour
 {
@@ -8,8 +9,8 @@ public class NPCDetector : MonoBehaviour
     public GameObject talkIcon;
 
     [Header("NPC Detection Settings")]
-    public LayerMask npcLayerMask = -1; // Layer của NPCs
-    public string npcTag = "NPC";       // Tag của NPCs
+    public LayerMask npcLayerMask = -1; // Layer for NPCs
+    public string npcTag = "NPC";       // Tag for NPCs
 
     void Start()
     {
@@ -26,18 +27,17 @@ public class NPCDetector : MonoBehaviour
     {
         if (context.performed && currentNPC != null && currentNPC.CanInteract())
         {
-            // Gọi hành động nói chuyện
             currentNPC.Interact();
             UpdateTalkIcon();
 
-            // Log để debug
+            // Log for debugging
             Debug.Log("Talked to NPC: " + ((MonoBehaviour)currentNPC).gameObject.name);
         }
     }
 
+    // Use OnTriggerEnter to find the NPC
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Kiểm tra layer và tag
         if (!IsValidNPC(other)) return;
 
         if (other.TryGetComponent(out IInteractable interactable))
@@ -49,6 +49,7 @@ public class NPCDetector : MonoBehaviour
         }
     }
 
+    // Use OnTriggerExit to clear the NPC
     private void OnTriggerExit2D(Collider2D other)
     {
         if (currentNPC != null && other.GetComponent<IInteractable>() == currentNPC)
@@ -65,10 +66,9 @@ public class NPCDetector : MonoBehaviour
     {
         if (talkIcon == null) return;
 
-        if (currentNPC != null)
+        if (currentNPC != null && currentNPC.CanInteract())
         {
-            bool canTalk = currentNPC.CanInteract();
-            talkIcon.SetActive(canTalk);
+            talkIcon.SetActive(true);
         }
         else
         {
@@ -76,21 +76,17 @@ public class NPCDetector : MonoBehaviour
         }
     }
 
-    // Kiểm tra xem NPC có hợp lệ không
     private bool IsValidNPC(Collider2D collider)
     {
-        // Kiểm tra layer
         if ((npcLayerMask.value & (1 << collider.gameObject.layer)) == 0)
             return false;
 
-        // Kiểm tra tag nếu được thiết lập
         if (!string.IsNullOrEmpty(npcTag) && !collider.CompareTag(npcTag))
             return false;
 
         return true;
     }
 
-    // Public methods để các script khác có thể truy cập
     public bool HasNPCInRange()
     {
         return currentNPC != null;
