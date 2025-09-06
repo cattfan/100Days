@@ -1,6 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class Trashbin : MonoBehaviour, IInteractable
 {
@@ -17,7 +18,7 @@ public class Trashbin : MonoBehaviour, IInteractable
     public GameObject itemPickupPrefab;
 
     [Header("Spawn Settings")]
-    public float spawnChance = 0.8f;
+    public float spawnChance = 0.999f;
     public int minItems = 1;
     public int maxItems = 3;
     public float spawnRadius = 1.5f;
@@ -110,14 +111,14 @@ public class Trashbin : MonoBehaviour, IInteractable
 
         if (randomValue <= spawnChance)
         {
-            Debug.Log("SUCCESS - Spawning items!");
+            Debug.Log($"[SUCCESS by chance] - Spawning items! Random={randomValue}, SpawnChance={spawnChance}");
             if (audioManagement != null)
                 audioManagement.PlaySFX(audioManagement.SuccessTrashbinInteract);
             SpawnRandomItems();
         }
         else
         {
-            Debug.Log("FAIL - No items found!");
+            Debug.Log($"[FAIL by chance] - No items found! Random={randomValue}, SpawnChance={spawnChance}");
             if (audioManagement != null)
                 audioManagement.PlaySFX(audioManagement.FailTrashbinInteract);
             ShowFailIcon();
@@ -163,15 +164,16 @@ public class Trashbin : MonoBehaviour, IInteractable
     // Spawn items sử dụng ItemData system
     private void SpawnItemsWithItemData()
     {
-        // Random số lượng item sẽ spawn
-        int itemCount = Random.Range(minItems, maxItems + 1);
+        // Trộn (shuffle) danh sách itemData để đảm bảo ngẫu nhiên và không trùng
+        List<ItemData> shuffledList = itemDataList.OrderBy(x => Random.value).ToList();
+
+        // Random số lượng item sẽ spawn, giới hạn tối đa bằng số item có trong list
+        int itemCount = Random.Range(minItems, Mathf.Min(maxItems + 1, shuffledList.Count));
         int actualSpawnedCount = 0;
 
         for (int i = 0; i < itemCount; i++)
         {
-            // Random chọn 1 ItemData
-            int randomIndex = Random.Range(0, itemDataList.Length);
-            ItemData selectedItemData = itemDataList[randomIndex];
+            ItemData selectedItemData = shuffledList[i];
 
             if (selectedItemData != null)
             {
@@ -193,12 +195,12 @@ public class Trashbin : MonoBehaviour, IInteractable
                 }
                 else
                 {
-                    Debug.LogWarning($"Failed to create item: {selectedItemData.itemName}");
+                    Debug.Log("[FAIL by item spawn] No items were actually spawned - showing fail icon");
                 }
             }
             else
             {
-                Debug.LogWarning($"ItemData at index {randomIndex} is null!");
+                Debug.LogWarning($"ItemData at index {i} is null!");
             }
         }
 
@@ -213,6 +215,7 @@ public class Trashbin : MonoBehaviour, IInteractable
             Debug.Log($"Successfully spawned {actualSpawnedCount} items!");
         }
     }
+
 
     // Animation item bay ra từ trashbin với hiệu ứng đẹp hơn
     private IEnumerator ItemFlyOutAnimation(GameObject item, Vector3 targetPosition, float delay = 0f)

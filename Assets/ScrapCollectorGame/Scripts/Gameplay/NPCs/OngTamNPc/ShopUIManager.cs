@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class ShopUIManager : MonoBehaviour
 {
@@ -29,6 +30,9 @@ public class ShopUIManager : MonoBehaviour
 
     private List<Slot> shopSlots = new List<Slot>();
 
+    // Lưu reference tới PlayerInput để disable/enable
+    private PlayerInput playerInput;
+
     private void Awake()
     {
         if (closeButton != null)
@@ -51,11 +55,15 @@ public class ShopUIManager : MonoBehaviour
 
         if (confirmationDialog != null)
             confirmationDialog.SetActive(false);
+
         GameObject audioObject = GameObject.FindGameObjectWithTag("Audio");
         if (audioObject != null)
         {
             audioManagement = audioObject.GetComponent<AudioManagement>();
         }
+
+        // Tìm PlayerInput component
+        playerInput = FindFirstObjectByType<PlayerInput>();
     }
 
     // Gọi từ ShopNPC
@@ -64,12 +72,20 @@ public class ShopUIManager : MonoBehaviour
         this.playerInventory = inventory;
         this.playerCurrency = currency;
 
+        // Disable player input
+        if (playerInput != null)
+            playerInput.enabled = false;
+
         CloneInventory();
         this.gameObject.SetActive(true);
     }
 
     private void CloseShopUI()
     {
+        // Enable lại player input
+        if (playerInput != null)
+            playerInput.enabled = true;
+
         ShopNPC shopNPC = FindFirstObjectByType<ShopNPC>();
         if (shopNPC != null) shopNPC.CloseShop();
 
@@ -85,7 +101,6 @@ public class ShopUIManager : MonoBehaviour
         currentItemQuantity = 0;
         audioManagement.PlaySFX(audioManagement.CloseMenu);
     }
-
 
     /// <summary>
     /// Clone inventory thật sang shop panel
@@ -111,9 +126,10 @@ public class ShopUIManager : MonoBehaviour
                     var itemClone = Instantiate(itemUIPrefab, slotClone.transform).GetComponent<ItemUI>();
                     itemClone.Setup(itemUI.GetItemData(), itemUI.Amount);
 
-                    // Vô hiệu hóa drag/drop trong shop
-                    var dragHandler = itemClone.GetComponent<ItemUI>();
-                    if (dragHandler != null) dragHandler.enabled = false;
+                    // ❌ KHÔNG disable ItemUI
+                    // ✅ Thay vào đó xóa drag handler
+                    var dragHandler = itemClone.GetComponent<ItemDragHandler>();
+                    if (dragHandler != null) Destroy(dragHandler);
 
                     slotClone.currentItem = itemClone.gameObject;
 
@@ -156,14 +172,12 @@ public class ShopUIManager : MonoBehaviour
         audioManagement.PlaySFX(audioManagement.Select);
     }
 
-
-
     private void HideConfirmation()
     {
         if (confirmationDialog != null)
             confirmationDialog.SetActive(false);
 
-       audioManagement.PlaySFX(audioManagement.CloseMenu);
+        audioManagement.PlaySFX(audioManagement.CloseMenu);
     }
 
     private void ConfirmSell()
@@ -199,8 +213,7 @@ public class ShopUIManager : MonoBehaviour
         currentPlayerSlotIndex = -1;
         currentItemQuantity = 0;
 
-       audioManagement.PlaySFX(audioManagement.SellItem);
+        audioManagement.PlaySFX(audioManagement.SellItem);
         Debug.Log($"Successfully sold item for {sellPrice} coins!");
     }
-
 }

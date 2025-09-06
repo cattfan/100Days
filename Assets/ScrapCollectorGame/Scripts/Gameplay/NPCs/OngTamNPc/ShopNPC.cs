@@ -43,7 +43,6 @@ public class ShopNPC : MonoBehaviour, IInteractable
             Debug.LogWarning("ShopNPC: Could not find CurrencyManager!");
     }
 
-
     public void Interact()
     {
         OpenShop();

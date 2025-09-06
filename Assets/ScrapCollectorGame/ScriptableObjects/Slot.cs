@@ -18,18 +18,22 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 
         GameObject draggedItem = eventData.pointerDrag;
         ItemUI draggedUI = draggedItem.GetComponent<ItemUI>();
+        ItemDragHandler dragHandler = draggedItem.GetComponent<ItemDragHandler>();
 
-        // Cờ hiệu cho ItemUI biết rằng nó đã được thả vào một Slot hợp lệ
-        draggedUI.droppedOnValidSlot = true;
+        if (draggedUI == null || dragHandler == null) return;
 
-        // Lấy thông tin về slot ban đầu
-        Slot originalSlot = draggedUI.originalParent.GetComponent<Slot>();
+        // Cờ hiệu cho ItemDragHandler biết rằng nó đã được thả vào một Slot hợp lệ
+        dragHandler.droppedOnValidSlot = true;
+
+        // Lấy thông tin về slot ban đầu từ dragHandler
+        Slot originalSlot = dragHandler.originalParent.GetComponent<Slot>();
 
         if (originalSlot == transform)
         {
             // Trường hợp 1: Thả vật phẩm trở lại ô ban đầu
             draggedItem.transform.SetParent(transform);
             draggedItem.transform.localPosition = Vector3.zero;
+            currentItem = draggedItem;
             return;
         }
 
@@ -39,15 +43,13 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
             draggedItem.transform.SetParent(transform);
             draggedItem.transform.localPosition = Vector3.zero;
             currentItem = draggedItem;
-            // Cập nhật slot ban đầu
+
             if (originalSlot != null)
-            {
                 originalSlot.currentItem = null;
-            }
         }
         else
         {
-            // Trường hợp Slot đã có item
+            // Slot đã có item
             ItemUI existingUI = currentItem.GetComponent<ItemUI>();
 
             // --- Trường hợp 2: Gộp vật phẩm ---
@@ -56,34 +58,28 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
             {
                 existingUI.AddAmount(draggedUI.Amount);
                 Destroy(draggedItem);
-                // Cập nhật slot ban đầu
+
                 if (originalSlot != null)
-                {
                     originalSlot.currentItem = null;
-                }
             }
             else
             {
-                // --- Trường hợp 3: Hoán đổi vật phẩm ---
+                // --- Trường hợp 3: Hoán đổi ---
                 GameObject existingItem = currentItem;
 
-                // Đặt item đang kéo vào slot này
                 draggedItem.transform.SetParent(transform);
                 draggedItem.transform.localPosition = Vector3.zero;
                 currentItem = draggedItem;
 
-                // Trả item cũ về slot ban đầu của item đang kéo
-                existingItem.transform.SetParent(draggedUI.originalParent);
+                existingItem.transform.SetParent(dragHandler.originalParent);
                 existingItem.transform.localPosition = Vector3.zero;
 
-                // Cập nhật lại reference cho slot ban đầu
                 if (originalSlot != null)
-                {
                     originalSlot.currentItem = existingItem;
-                }
             }
         }
     }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (inventoryController != null)
@@ -91,5 +87,4 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
             inventoryController.HandleSlotClick(this, eventData.button);
         }
     }
-
 }
