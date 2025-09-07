@@ -3,14 +3,15 @@ using UnityEngine.EventSystems;
 
 public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
-    public Transform originalParent { get; private set; }
-    private RectTransform inventoryPanelRect;
-    private Canvas parentCanvas;
-    private CanvasGroup canvasGroup;
+    [Header("Drag Settings")]
+    public Transform originalParent;
     public bool droppedOnValidSlot = false;
 
+    private CanvasGroup canvasGroup;
+    private Canvas parentCanvas;
+    private RectTransform inventoryPanelRect;
     private AudioManagement audioManager;
-    private ItemUI itemUI;
+    private Vector3 startPosition;
 
     private void Awake()
     {
@@ -19,85 +20,113 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
         parentCanvas = GetComponentInParent<Canvas>();
+        audioManager = FindObjectOfType<AudioManagement>();
 
         var inventoryController = FindObjectOfType<InventoryController>();
         if (inventoryController != null)
             inventoryPanelRect = inventoryController.GetInventoryPanel();
+    }
 
-        audioManager = FindObjectOfType<AudioManagement>();
-        itemUI = GetComponent<ItemUI>();
+    private void Start()
+    {
+        if (originalParent == null)
+            originalParent = transform.parent;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        droppedOnValidSlot = false;
+        Debug.Log($"[DRAG] Begin drag: {gameObject.name}");
+
         originalParent = transform.parent;
+        startPosition = transform.position;
+        droppedOnValidSlot = false;
 
-        var originalSlot = originalParent.GetComponent<Slot>();
-        if (originalSlot != null)
-            originalSlot.currentItem = null;
+        // Disable raycasts để có thể drop
+        canvasGroup.blocksRaycasts = false;
 
-        if (parentCanvas != null)
-            transform.SetParent(parentCanvas.transform, true);
-        else
-            transform.SetParent(transform.root, true);
-
-        if (canvasGroup != null) canvasGroup.blocksRaycasts = false;
+        // Move to canvas level để render trên tất cả UI
+        transform.SetParent(parentCanvas.transform);
+        transform.SetAsLastSibling();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        // Follow mouse
         transform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        Debug.Log($"[DRAG] End drag: {gameObject.name}, dropped on valid slot: {droppedOnValidSlot}");
+
+        canvasGroup.blocksRaycasts = true;
+
         if (!droppedOnValidSlot)
         {
-            bool isInsideInventoryPanel = IsInsideInventoryPanel(eventData.position, eventData.pressEventCamera);
+            bool isInsideInventory = IsInsideInventoryPanel(eventData.position);
 
-            if (isInsideInventoryPanel)
+            if (isInsideInventory)
             {
-                transform.SetParent(originalParent);
-                transform.localPosition = Vector3.zero;
-
-                var originalSlot = originalParent.GetComponent<Slot>();
-                if (originalSlot != null)
-                    originalSlot.currentItem = gameObject;
+                // Return to original position
+                ReturnToOriginal();
+                Debug.Log("[DRAG] Returned to original slot");
             }
             else
             {
+                // Destroy if dropped outside
                 var originalSlot = originalParent.GetComponent<Slot>();
                 if (originalSlot != null)
                     originalSlot.currentItem = null;
 
+                Debug.Log("[DRAG] Item destroyed - dropped outside inventory");
                 Destroy(gameObject);
                 audioManager?.PlaySFX(audioManager.DropItem);
             }
         }
         else
         {
+            Debug.Log("[DRAG] Successfully placed in new slot");
             audioManager?.PlaySFX(audioManager.PlaceItem);
         }
 
-        if (canvasGroup != null) canvasGroup.blocksRaycasts = true;
+        droppedOnValidSlot = false; // Reset flag
     }
 
-    private bool IsInsideInventoryPanel(Vector3 screenPosition, Camera camera)
+    private void ReturnToOriginal()
     {
-        if (inventoryPanelRect == null) return false;
+        transform.SetParent(originalParent);
+        transform.localPosition = Vector3.zero;
+
+        var slot = originalParent.GetComponent<Slot>();
+        if (slot != null)
+            slot.currentItem = gameObject;
+    }
+
+    private bool IsInsideInventoryPanel(Vector2 screenPosition)
+    {
+        if (inventoryPanelRect == null) return true;
 
         return RectTransformUtility.RectangleContainsScreenPoint(
             inventoryPanelRect,
             screenPosition,
-            camera
+            parentCanvas.worldCamera
         );
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        // Only handle clicks for shop mode
         var slot = GetComponentInParent<Slot>();
         var controller = FindObjectOfType<InventoryController>();
-        controller.HandleSlotClick(slot, eventData.button);
+
+        if (controller != null && slot != null && controller.shopMode)
+        {
+            controller.HandleSlotClick(slot, eventData.button);
+        }
+    }
+
+    public void UpdateOriginalParent(Transform newParent)
+    {
+        originalParent = newParent;
     }
 }

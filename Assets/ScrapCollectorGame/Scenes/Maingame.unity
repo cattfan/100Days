@@ -13813,7 +13813,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MenuCanvas: {fileID: 918509206}
   tabsController: {fileID: 138426638}
-  inventoryController: {fileID: 0}
 --- !u!114 &904710051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298049,6 +298048,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1172178578285348083, guid: 29e9c449eee292d419542fe988130f72, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1463482215461408684, guid: 29e9c449eee292d419542fe988130f72, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0.000021935
@@ -298087,7 +298090,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3210501217484910614, guid: 29e9c449eee292d419542fe988130f72, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3372908933215910516, guid: 29e9c449eee292d419542fe988130f72, type: 3}
       propertyPath: m_AnchoredPosition.x
