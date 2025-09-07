@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-// Slot.cs: Xử lý hành vi thả của vật phẩm
 public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
+    [Header("Slot Settings")]
     public GameObject currentItem;
+
     private InventoryController inventoryController;
 
     private void Start()
@@ -14,69 +15,115 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-        if (eventData.pointerDrag == null) return;
-
         GameObject draggedItem = eventData.pointerDrag;
-        ItemUI draggedUI = draggedItem.GetComponent<ItemUI>();
+        if (draggedItem == null) return;
+
         ItemDragHandler dragHandler = draggedItem.GetComponent<ItemDragHandler>();
+        ItemUI draggedUI = draggedItem.GetComponent<ItemUI>();
 
-        if (draggedUI == null || dragHandler == null) return;
+        if (dragHandler == null || draggedUI == null) return;
 
-        // Cờ hiệu cho ItemDragHandler biết rằng nó đã được thả vào một Slot hợp lệ
+        Debug.Log($"[SLOT] Item {draggedItem.name} dropped on slot");
+
+        // Mark as valid drop
         dragHandler.droppedOnValidSlot = true;
 
-        // Lấy thông tin về slot ban đầu từ dragHandler
+        // Get original slot
         Slot originalSlot = dragHandler.originalParent.GetComponent<Slot>();
 
-        if (originalSlot == transform)
+        // Case 1: Dropping back to same slot
+        if (originalSlot == this)
         {
-            // Trường hợp 1: Thả vật phẩm trở lại ô ban đầu
-            draggedItem.transform.SetParent(transform);
-            draggedItem.transform.localPosition = Vector3.zero;
-            currentItem = draggedItem;
+            Debug.Log("[SLOT] Dropping back to same slot");
+            ReturnItemToSlot(draggedItem);
             return;
         }
 
-        // --- Trường hợp Slot đang trống hoặc không có item nào khác ---
+        // Case 2: This slot is empty
         if (currentItem == null)
         {
-            draggedItem.transform.SetParent(transform);
-            draggedItem.transform.localPosition = Vector3.zero;
-            currentItem = draggedItem;
-
-            if (originalSlot != null)
-                originalSlot.currentItem = null;
+            Debug.Log("[SLOT] Moving item to empty slot");
+            MoveItemToSlot(draggedItem, originalSlot, dragHandler);
         }
         else
         {
-            // Slot đã có item
+            // Case 3: This slot has an item
             ItemUI existingUI = currentItem.GetComponent<ItemUI>();
 
-            // --- Trường hợp 2: Gộp vật phẩm ---
-            if (existingUI.GetItemData() == draggedUI.GetItemData()
-                && existingUI.GetItemData().isStackable)
+            // Try to stack if same item type
+            if (CanStackItems(existingUI, draggedUI))
             {
-                existingUI.AddAmount(draggedUI.Amount);
-                Destroy(draggedItem);
-
-                if (originalSlot != null)
-                    originalSlot.currentItem = null;
+                Debug.Log("[SLOT] Stacking items");
+                StackItems(existingUI, draggedUI, draggedItem, originalSlot);
             }
             else
             {
-                // --- Trường hợp 3: Hoán đổi ---
-                GameObject existingItem = currentItem;
-
-                draggedItem.transform.SetParent(transform);
-                draggedItem.transform.localPosition = Vector3.zero;
-                currentItem = draggedItem;
-
-                existingItem.transform.SetParent(dragHandler.originalParent);
-                existingItem.transform.localPosition = Vector3.zero;
-
-                if (originalSlot != null)
-                    originalSlot.currentItem = existingItem;
+                Debug.Log("[SLOT] Swapping items");
+                SwapItems(draggedItem, currentItem, originalSlot, dragHandler);
             }
+        }
+    }
+
+    private void ReturnItemToSlot(GameObject item)
+    {
+        item.transform.SetParent(transform);
+        item.transform.localPosition = Vector3.zero;
+        currentItem = item;
+    }
+
+    private void MoveItemToSlot(GameObject draggedItem, Slot originalSlot, ItemDragHandler dragHandler)
+    {
+        // Move item to this slot
+        draggedItem.transform.SetParent(transform);
+        draggedItem.transform.localPosition = Vector3.zero;
+        currentItem = draggedItem;
+
+        // Update original parent
+        dragHandler.UpdateOriginalParent(transform);
+
+        // Clear original slot
+        if (originalSlot != null)
+            originalSlot.currentItem = null;
+    }
+
+    private bool CanStackItems(ItemUI existingUI, ItemUI draggedUI)
+    {
+        return existingUI.GetItemData() == draggedUI.GetItemData() &&
+               existingUI.GetItemData().isStackable;
+    }
+
+    private void StackItems(ItemUI existingUI, ItemUI draggedUI, GameObject draggedItem, Slot originalSlot)
+    {
+        // Add amounts
+        existingUI.AddAmount(draggedUI.Amount);
+
+        // Destroy dragged item
+        Destroy(draggedItem);
+
+        // Clear original slot
+        if (originalSlot != null)
+            originalSlot.currentItem = null;
+    }
+
+    private void SwapItems(GameObject draggedItem, GameObject existingItem, Slot originalSlot, ItemDragHandler dragHandler)
+    {
+        // Place dragged item in this slot
+        draggedItem.transform.SetParent(transform);
+        draggedItem.transform.localPosition = Vector3.zero;
+        currentItem = draggedItem;
+        dragHandler.UpdateOriginalParent(transform);
+
+        // Move existing item to original slot
+        if (originalSlot != null)
+        {
+            existingItem.transform.SetParent(originalSlot.transform);
+            existingItem.transform.localPosition = Vector3.zero;
+            originalSlot.currentItem = existingItem;
+
+            // Update existing item's drag handler
+            ItemDragHandler existingHandler = existingItem.GetComponent<ItemDragHandler>();
+            if (existingHandler != null)
+                existingHandler.UpdateOriginalParent(originalSlot.transform);
         }
     }
 
@@ -85,6 +132,18 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (inventoryController != null)
         {
             inventoryController.HandleSlotClick(this, eventData.button);
+        }
+    }
+
+    // Helper methods
+    public bool IsEmpty() => currentItem == null;
+
+    public void ClearSlot()
+    {
+        if (currentItem != null)
+        {
+            Destroy(currentItem);
+            currentItem = null;
         }
     }
 }
