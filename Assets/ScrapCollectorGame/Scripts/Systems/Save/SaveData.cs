@@ -19,15 +19,18 @@ public class InventoryItemData
 [System.Serializable]
 public class SaveData
 {
+    public string playerName;      // TÊN PLAYER - THÊM MỚI
     public Vector3 playerPosition;
     public Quaternion playerRotation;
     public float playerEnergy;
     public int playerCurrency;
-    public List<InventoryItemData> inventoryItems; // Thay thế scrapCollected
+    public List<InventoryItemData> inventoryItems;
 
-    // Constructor với inventory
-    public SaveData(Vector3 playerPosition, Quaternion playerRotation, float playerEnergy, int playerCurrency, List<InventoryItemData> inventoryItems)
+    // Constructor với inventory và playerName
+    public SaveData(string playerName, Vector3 playerPosition, Quaternion playerRotation,
+                   float playerEnergy, int playerCurrency, List<InventoryItemData> inventoryItems)
     {
+        this.playerName = string.IsNullOrEmpty(playerName) ? "Player" : playerName;
         this.playerPosition = playerPosition;
         this.playerRotation = playerRotation;
         this.playerEnergy = playerEnergy;
@@ -38,6 +41,7 @@ public class SaveData
     // Constructor mặc định cho JsonUtility
     public SaveData()
     {
+        playerName = "Player";
         playerPosition = Vector3.zero;
         playerRotation = Quaternion.identity;
         playerEnergy = 100f;

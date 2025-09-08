@@ -3,12 +3,12 @@
 public class ShopManager : MonoBehaviour
 {
     private CurrencyManager currencyManager;
-    private InventoryController inventoryController;
+    private InventoryManager inventoryController;
 
     private void Awake()
     {
         currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
-        inventoryController = Object.FindFirstObjectByType<InventoryController>();
+        inventoryController = Object.FindFirstObjectByType<InventoryManager>();
 
         if (currencyManager == null)
             Debug.LogError("ShopManager: Không tìm thấy CurrencyManager trong scene!");

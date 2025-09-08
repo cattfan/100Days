@@ -6,11 +6,12 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
     [Header("Slot Settings")]
     public GameObject currentItem;
 
-    private InventoryController inventoryController;
+    private InventoryInteraction inventoryInteract;
+    private InventoryManager inventoryManager;
 
     private void Start()
     {
-        inventoryController = FindObjectOfType<InventoryController>();
+        inventoryManager = FindObjectOfType<InventoryManager>();
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -129,9 +130,9 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (inventoryController != null)
+        if (inventoryInteract != null)
         {
-            inventoryController.HandleSlotClick(this, eventData.button);
+            inventoryInteract.HandleSlotClick(this, eventData.button);
         }
     }
 
