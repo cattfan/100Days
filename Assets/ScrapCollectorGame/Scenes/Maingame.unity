@@ -12310,6 +12310,7 @@ GameObject:
   - component: {fileID: 572949939}
   - component: {fileID: 572949942}
   - component: {fileID: 572949943}
+  - component: {fileID: 572949944}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -12332,7 +12333,7 @@ MonoBehaviour:
   player: {fileID: 2110757293}
   currencyManager: {fileID: 922410621}
   playerEnergyManager: {fileID: 2110757298}
-  inventoryPersistence: {fileID: 0}
+  inventoryPersistence: {fileID: 572949944}
   playerName: Player
 --- !u!4 &572949940
 Transform:
@@ -12383,6 +12384,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: eae5c3148bd05334488b3198a7fbeec8, type: 2}
   - {fileID: 11400000, guid: a83d1888ae8227c46bc9ec535cf03573, type: 2}
   - {fileID: 11400000, guid: 510b14261f6be084cb9e7085dafea4aa, type: 2}
+--- !u!114 &572949944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572949938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58092eda8b93c934e95722270da410a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryManager: {fileID: 572949943}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -297798,7 +297812,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d89e2e0eef8ed940b50cf0594e228be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryController: {fileID: 0}
 --- !u!114 &2110757298
 MonoBehaviour:
   m_ObjectHideFlags: 0

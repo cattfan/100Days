@@ -167,7 +167,7 @@ public class InventoryManager : MonoBehaviour
 
     public RectTransform GetInventoryPanel() => inventoryPanel;
 
-    protected ItemData FindItemDataByName(string itemName)
+    public ItemData FindItemDataByName(string itemName)
     {
         if (allItems != null)
         {
@@ -223,6 +223,36 @@ public class InventoryManager : MonoBehaviour
             return remainingAmount > emptySlots;
         }
     }
+    public void ClearInventory()
+    {
+        foreach (var slot in GetSlots())
+        {
+            if (slot.currentItem != null)
+            {
+                Destroy(slot.currentItem);
+                slot.currentItem = null;
+            }
+        }
+    }
 
+    public void CreateItemAtSlot(ItemData data, int amount, int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= GetSlots().Count) return;
+
+        var slot = GetSlots()[slotIndex];
+        if (slot.currentItem != null) return;
+
+        var itemGO = Instantiate(Resources.Load<GameObject>("ItemUIPrefab"), slot.transform);
+        var uiComp = itemGO.GetComponent<ItemUI>();
+        if (uiComp != null)
+        {
+            uiComp.Setup(data, amount);
+            slot.currentItem = itemGO;
+        }
+        else
+        {
+            Destroy(itemGO);
+        }
+    }
 
 }
