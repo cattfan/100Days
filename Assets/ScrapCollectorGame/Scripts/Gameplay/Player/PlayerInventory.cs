@@ -5,36 +5,18 @@ public class PlayerInventory : MonoBehaviour
 {
     public List<ShopItem> inventory;
 
-    private CurrencyManager currencyManager;
+    // Không cần CurrencyManager ở đây, vì logic mua hàng sẽ nằm ở ShopManager
+    // private CurrencyManager currencyManager;
 
     void Awake()
     {
-        // Thay thế FindObjectOfType bằng FindAnyObjectByType để code của bạn được cập nhật
-        currencyManager = FindAnyObjectByType<CurrencyManager>();
+        // Loại bỏ dòng này vì không còn cần thiết
+        // currencyManager = FindAnyObjectByType<CurrencyManager>();
     }
 
-    public void BuyItem(ShopItem itemToBuy)
-    {
-        if (currencyManager == null)
-        {
-            Debug.LogError("CurrencyManager not found in the scene.");
-            return;
-        }
-
-        // Kiểm tra xem người chơi có đủ tiền hay không
-        if (currencyManager.GetCoins() >= itemToBuy.itemCost)
-        {
-            // Trừ tiền bằng cách gọi hàm SpendCoins() từ CurrencyManager
-            currencyManager.SpendCoins(itemToBuy.itemCost);
-
-            // Thêm vật phẩm vào kho đồ của người chơi
-            inventory.Add(itemToBuy);
-
-            Debug.Log($"Đã mua {itemToBuy.itemName}. Tiền còn lại: {currencyManager.GetCoins()}");
-        }
-        else
-        {
-            Debug.Log("Không đủ tiền để mua!");
-        }
-    }
+    // Xóa hoàn toàn hàm BuyItem này
+    // public void BuyItem(ShopItem itemToBuy)
+    // {
+    //     ...
+    // }
 }

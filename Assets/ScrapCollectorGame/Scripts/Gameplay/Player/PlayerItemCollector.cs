@@ -1,33 +1,32 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerItemCollector : MonoBehaviour
 {
+    // Sử dụng Singleton nếu InventoryController là Singleton
+    // private InventoryController inventoryController => InventoryController.Instance;
     private InventoryController inventoryController;
 
-    [System.Obsolete]
     void Start()
     {
-        inventoryController = FindObjectOfType<InventoryController>();
+        // Giữ lại cách này nếu InventoryController không phải là Singleton
+        inventoryController = FindAnyObjectByType<InventoryController>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Item"))
         {
-            // Thay đổi từ Item thành ItemPickup
             ItemPickup itemPickup = collision.gameObject.GetComponent<ItemPickup>();
             if (itemPickup != null)
             {
-                // Kiểm tra xem item có sẵn sàng pickup không
                 if (itemPickup.CanBePickedUp())
                 {
-                    // Lấy thông tin item từ ItemData
                     ItemData itemData = itemPickup.itemData;
                     int currentAmount = itemPickup.currentAmount;
 
                     if (itemData != null)
                     {
-                        // 🎯 HIỂN THỊ POPUP UI
                         if (ItemPickupUIController.Instance != null)
                         {
                             string displayText = itemData.itemName;
@@ -38,19 +37,23 @@ public class PlayerItemCollector : MonoBehaviour
                             ItemPickupUIController.Instance.ShowItemPickup(displayText, itemData.itemIcon);
                         }
 
-                        // Add the item to the inventory
-                        inventoryController.AddItem(itemData, currentAmount);
+                        // Đảm bảo inventoryController không null trước khi gọi
+                        if (inventoryController != null)
+                        {
+                            inventoryController.AddItem(itemData, currentAmount);
+                        }
+                        else
+                        {
+                            Debug.LogError("PlayerItemCollector: InventoryController is null!");
+                        }
 
-                        // Debug log để kiểm tra
                         Debug.Log($"Đã thu thập: {itemData.itemName} x{currentAmount} (ID: {itemData.itemID})");
 
-                        // Play pickup sound nếu có
                         if (itemPickup.audioManagement != null)
                         {
                             itemPickup.audioManagement.PlaySFX(itemPickup.audioManagement.PickupItem);
                         }
 
-                        // Destroy the item after collection
                         Destroy(collision.gameObject);
                     }
                     else

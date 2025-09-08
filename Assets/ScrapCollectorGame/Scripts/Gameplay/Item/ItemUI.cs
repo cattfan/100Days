@@ -27,11 +27,11 @@ public class ItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         parentCanvas = GetComponentInParent<Canvas>();
 
         // Tìm inventory panel
-        var inventoryController = FindObjectOfType<InventoryController>();
+        var inventoryController = FindFirstObjectByType<InventoryController>();
         if (inventoryController != null)
             inventoryPanelRect = inventoryController.GetInventoryPanel();
 
-        audioManager = FindObjectOfType<AudioManagement>();
+        audioManager = FindFirstObjectByType<AudioManagement>();
     }
 
     public void Setup(ItemData data, int qty = 1)
@@ -156,7 +156,7 @@ public class ItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     public void OnPointerClick(PointerEventData eventData)
     {
         var slot = GetComponentInParent<Slot>();
-        var controller = FindObjectOfType<InventoryController>();
+        var controller = FindFirstObjectByType<InventoryController>();
         controller.HandleSlotClick(slot, eventData.button);
     }
 }

@@ -16,6 +16,8 @@ MonoBehaviour:
   description: Taco
   itemIcon: {fileID: 2069420720813572178, guid: 5131271e542c95c40b9d03eec9917723, type: 3}
   itemID: 19
+  isFood: 1
+  staminaRestoreAmount: 30
   rarity: 0
   dropRate: 50
   minDropAmount: 1
@@ -23,6 +25,6 @@ MonoBehaviour:
   baseSellPrice: 10
   baseBuyPrice: 5
   canSell: 0
-  isStackable: 0
-  maxStackSize: 1
+  isStackable: 1
+  maxStackSize: 10
   pickupDelay: 999

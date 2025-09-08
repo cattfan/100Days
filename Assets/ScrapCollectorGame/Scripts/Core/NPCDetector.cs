@@ -25,17 +25,16 @@ public class NPCDetector : MonoBehaviour
 
     public void OnTalk(InputAction.CallbackContext context)
     {
-        if (context.performed && currentNPC != null && currentNPC.CanInteract())
+        if (context.performed && currentNPC != null)
         {
             currentNPC.Interact();
-            UpdateTalkIcon();
 
             // Log for debugging
             Debug.Log("Talked to NPC: " + ((MonoBehaviour)currentNPC).gameObject.name);
         }
     }
 
-    // Use OnTriggerEnter to find the NPC
+    // Khi player vào vùng NPC
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!IsValidNPC(other)) return;
@@ -49,7 +48,7 @@ public class NPCDetector : MonoBehaviour
         }
     }
 
-    // Use OnTriggerExit to clear the NPC
+    // Khi player rời vùng NPC
     private void OnTriggerExit2D(Collider2D other)
     {
         if (currentNPC != null && other.GetComponent<IInteractable>() == currentNPC)
@@ -66,14 +65,11 @@ public class NPCDetector : MonoBehaviour
     {
         if (talkIcon == null) return;
 
-        if (currentNPC != null && currentNPC.CanInteract())
-        {
+        // ✅ Icon chỉ hiện nếu player đang ở gần NPC
+        if (currentNPC != null)
             talkIcon.SetActive(true);
-        }
         else
-        {
             talkIcon.SetActive(false);
-        }
     }
 
     private bool IsValidNPC(Collider2D collider)

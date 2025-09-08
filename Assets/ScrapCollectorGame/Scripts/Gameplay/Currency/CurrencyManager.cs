@@ -4,36 +4,55 @@ using TMPro;
 
 public class CurrencyManager : MonoBehaviour
 {
-    public TMP_Text coinText;
-    private int coins = 0; // Biến coins đã là private
+    // 🎯 Singleton Instance: Public static property to access the single instance
+    public static CurrencyManager Instance { get; private set; }
 
-    // Thêm hàm public để lấy giá trị của biến coins
-    public int GetCoins()
+    public TMP_Text coinText;
+    private int coins = 0;
+
+    private void Awake()
     {
-        return coins;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);  // Giữ lại bản đầu tiên
+            Debug.Log("CurrencyManager chính: " + gameObject.name);
+        }
+        else
+        {
+            Debug.Log("CurrencyManager phụ (không bị xóa): " + gameObject.name);
+            // KHÔNG destroy nữa
+        }
     }
+
+
+
 
     void Start()
     {
         UpdateCoinText();
     }
 
- 
-   void Update()
+    void Update()
     {
-        // Test tăng tiền khi nhấn phím T
+        // Test function: Press 'T' to add 10 coins
         if (Keyboard.current.tKey.wasPressedThisFrame)
         {
-            AddCoins(10); // tăng 10 coins
+            AddCoins(10);
             Debug.Log("Đã thêm 10 coins");
         }
 
-        // Test giảm tiền khi nhấn phím G
+        // Test function: Press 'G' to spend 5 coins
         if (Keyboard.current.gKey.wasPressedThisFrame)
         {
-            SpendCoins(5); // giảm 5 coins
+            SpendCoins(5);
             Debug.Log("Đã trừ 5 coins");
         }
+    }
+
+    public int GetCoins()
+    {
+        return coins;
     }
 
     public void AddCoins(int amount)
@@ -57,6 +76,9 @@ public class CurrencyManager : MonoBehaviour
 
     private void UpdateCoinText()
     {
-        coinText.text = ": " + coins;
+        if (coinText != null)
+        {
+            coinText.text = ": " + coins.ToString();
+        }
     }
 }

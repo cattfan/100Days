@@ -221,6 +221,28 @@ public class InventoryController : MonoBehaviour
             if (slot.currentItem != null)
             {
                 var slotUI = slot.currentItem.GetComponent<ItemUI>();
+                var itemData = slotUI.GetItemData();
+
+                // Kiểm tra nếu vật phẩm là thức ăn
+                if (itemData != null && itemData.isFood)
+                {
+                    var playerStamina = FindAnyObjectByType<PlayerStamina>();
+                    if (playerStamina != null)
+                    {
+                        playerStamina.RestoreStamina(itemData.staminaRestoreAmount);
+                    }
+
+                    // Giảm số lượng vật phẩm đi 1
+                    slotUI.AddAmount(-1);
+                    if (slotUI.Amount <= 0)
+                    {
+                        Destroy(slot.currentItem);
+                        slot.currentItem = null;
+                    }
+                    return; // THÊM DÒNG NÀY ĐỂ THOÁT KHỎI PHƯƠNG THỨC SAU KHI SỬ DỤNG
+                }
+
+                // Logic tách stack cũ, chỉ chạy nếu không phải là đồ ăn
                 if (slotUI.Amount > 1)
                 {
                     int half = slotUI.Amount / 2;
@@ -270,7 +292,8 @@ public class InventoryController : MonoBehaviour
 
         if (shopMode)
         {
-            var shopUI = FindFirstObjectByType<ShopUIManager>();
+            // Đã thay thế FindFirstObjectByType bằng FindAnyObjectByType
+            var shopUI = FindAnyObjectByType<ShopUIManager>();
             if (shopUI != null)
             {
                 int slotIndex = GetSlots().IndexOf(slot);
@@ -279,7 +302,7 @@ public class InventoryController : MonoBehaviour
         }
         else
         {
-            // luôn coi như Left click
+            // Always treat as Left click
             HandleSlotClick(slot, PointerEventData.InputButton.Left);
         }
     }

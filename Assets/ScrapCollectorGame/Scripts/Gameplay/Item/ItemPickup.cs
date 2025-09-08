@@ -283,7 +283,7 @@ public class ItemPickup : MonoBehaviour
         }
 
         // ✅ Thêm vào inventory
-        InventoryController inv = FindObjectOfType<InventoryController>();
+        InventoryController inv = FindFirstObjectByType<InventoryController>();
         if (inv != null)
         {
             inv.AddItem(itemData, currentAmount);

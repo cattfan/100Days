@@ -2,28 +2,30 @@
 
 public class ShopManager : MonoBehaviour
 {
-    private CurrencyManager currencyManager;
+    // Access the Singleton instance directly, ensuring consistent access
+    private CurrencyManager currencyManager => CurrencyManager.Instance;
     private InventoryController inventoryController;
 
     private void Awake()
     {
-        currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
+        // This remains the same as InventoryController is likely not a Singleton
         inventoryController = Object.FindFirstObjectByType<InventoryController>();
 
-        if (currencyManager == null)
-            Debug.LogError("ShopManager: Không tìm thấy CurrencyManager trong scene!");
         if (inventoryController == null)
             Debug.LogError("ShopManager: Không tìm thấy InventoryController trong scene!");
     }
 
     public void BuyItem(ShopItem shopItem)
     {
+        // Check if the Singleton instance exists before using it
         if (currencyManager == null || inventoryController == null || shopItem == null)
+        {
+            Debug.LogError("Không thể mua hàng: Thiếu tham chiếu cần thiết.");
             return;
+        }
 
         if (currencyManager.GetCoins() >= shopItem.itemCost)
         {
-            // Kiểm tra xem dữ liệu ItemData có tồn tại không
             if (shopItem.itemData != null)
             {
                 currencyManager.SpendCoins(shopItem.itemCost);

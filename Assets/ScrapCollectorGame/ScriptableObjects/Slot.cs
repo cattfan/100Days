@@ -9,7 +9,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     private void Start()
     {
-        inventoryController = FindObjectOfType<InventoryController>();
+        inventoryController = FindFirstObjectByType<InventoryController>();
     }
 
     public void OnDrop(PointerEventData eventData)

@@ -1,141 +1,55 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using System.Collections;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
 
-public class NpcShopInteraction : MonoBehaviour
+public class NpcShopInteraction : MonoBehaviour, IInteractable
 {
-    private bool playerIsNear = false;
-    private InputAction interactAction;
     private bool isShopOpen = false;
-    public string shopSceneName = "Shop";
-    public ShopData shopItemsData;
 
-    private EventSystem mainEventSystem;
+    [Header("UI")]
+    public GameObject shopCanvas;
+
     private PlayerInput playerInput;
 
     private void Awake()
     {
-        interactAction = new InputAction(binding: "<Keyboard>/e");
-        interactAction.performed += OnInteract;
-
-        // Thay thế FindObjectOfType bằng FindAnyObjectByType
-        mainEventSystem = FindAnyObjectByType<EventSystem>();
         playerInput = FindAnyObjectByType<PlayerInput>();
+
+        if (shopCanvas != null)
+            shopCanvas.SetActive(false);
     }
 
-    private void OnEnable()
+    // Hàm gọi khi player bấm phím (qua NPCDetector)
+    public void Interact()
     {
-        interactAction.Enable();
+        if (!isShopOpen)
+            OpenShop();
+        else
+            CloseShop();
     }
 
-    private void OnDisable()
+    // ✅ Luôn cho phép tương tác (dù shop mở hay tắt)
+    public bool CanInteract()
     {
-        interactAction.Disable();
-        interactAction.performed -= OnInteract;
+        return shopCanvas != null;
     }
 
-    private void OnInteract(InputAction.CallbackContext context)
+    private void OpenShop()
     {
-        if (playerIsNear)
+        if (shopCanvas != null)
         {
-            if (!isShopOpen)
-            {
-                StartCoroutine(LoadAndOpenShop());
-            }
-            else
-            {
-                UnloadShopScene();
-            }
+            shopCanvas.SetActive(true);
+            isShopOpen = true;
         }
     }
 
-    IEnumerator LoadAndOpenShop()
+
+    public void CloseShop()
     {
-        if (playerInput != null)
+        if (shopCanvas != null)
         {
-            playerInput.enabled = false;
-        }
-        if (mainEventSystem != null)
-        {
-            mainEventSystem.gameObject.SetActive(false);
-        }
-
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(shopSceneName, LoadSceneMode.Additive);
-        while (!asyncLoad.isDone)
-        {
-            yield return null;
-        }
-
-        Scene shopScene = SceneManager.GetSceneByName(shopSceneName);
-        if (shopScene.isLoaded)
-        {
-            GameObject[] rootObjects = shopScene.GetRootGameObjects();
-            foreach (GameObject obj in rootObjects)
-            {
-                ShopUIController shopUIController = obj.GetComponentInChildren<ShopUIController>();
-                if (shopUIController != null)
-                {
-                    shopUIController.SetShopData(shopItemsData);
-                    obj.SetActive(true);
-                    RectTransform rectTransform = obj.GetComponent<RectTransform>();
-                    if (rectTransform != null)
-                    {
-                        rectTransform.anchoredPosition3D = Vector3.zero;
-                    }
-
-                    // Tìm EventSystem của scene shop
-                    EventSystem shopEventSystem = obj.GetComponentInChildren<EventSystem>();
-                    if (shopEventSystem == null)
-                    {
-                        GameObject eventSystemObj = new GameObject("EventSystem");
-                        eventSystemObj.AddComponent<EventSystem>();
-                        eventSystemObj.AddComponent<InputSystemUIInputModule>();
-                        eventSystemObj.transform.SetParent(obj.transform);
-                        shopEventSystem = eventSystemObj.GetComponent<EventSystem>();
-                    }
-                    if (shopEventSystem != null)
-                    {
-                        shopEventSystem.gameObject.SetActive(true);
-                    }
-
-                    break;
-                }
-            }
-        }
-        isShopOpen = true;
-    }
-
-    void UnloadShopScene()
-    {
-        SceneManager.UnloadSceneAsync(shopSceneName);
-        isShopOpen = false;
-
-        if (playerInput != null)
-        {
-            playerInput.enabled = true;
-        }
-        if (mainEventSystem != null)
-        {
-            mainEventSystem.gameObject.SetActive(true);
+            shopCanvas.SetActive(false);
+            isShopOpen = false;
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            playerIsNear = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            playerIsNear = false;
-        }
-    }
 }

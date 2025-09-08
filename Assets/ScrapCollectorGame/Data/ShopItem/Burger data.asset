@@ -16,6 +16,8 @@ MonoBehaviour:
   description: Burger
   itemIcon: {fileID: 6234330970754847308, guid: 083959b1123d8424f9ff587484ab2cf9, type: 3}
   itemID: 22
+  isFood: 1
+  staminaRestoreAmount: 30
   rarity: 0
   dropRate: 50
   minDropAmount: 1
@@ -24,5 +26,5 @@ MonoBehaviour:
   baseBuyPrice: 5
   canSell: 0
   isStackable: 1
-  maxStackSize: 1
+  maxStackSize: 10
   pickupDelay: 999
