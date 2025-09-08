@@ -2,6 +2,7 @@
 
 public class ShopManager : MonoBehaviour
 {
+<<<<<<< HEAD
     // Access the Singleton instance directly, ensuring consistent access
     private CurrencyManager currencyManager => CurrencyManager.Instance;
     private InventoryController inventoryController;
@@ -10,6 +11,15 @@ public class ShopManager : MonoBehaviour
     {
         // This remains the same as InventoryController is likely not a Singleton
         inventoryController = Object.FindFirstObjectByType<InventoryController>();
+=======
+    private CurrencyManager currencyManager;
+    private InventoryManager inventoryController;
+
+    private void Awake()
+    {
+        currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
+        inventoryController = Object.FindFirstObjectByType<InventoryManager>();
+>>>>>>> origin/main
 
         if (inventoryController == null)
             Debug.LogError("ShopManager: Không tìm thấy InventoryController trong scene!");

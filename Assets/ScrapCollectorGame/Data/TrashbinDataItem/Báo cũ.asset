@@ -20,7 +20,7 @@ MonoBehaviour:
   dropRate: 50
   minDropAmount: 1
   maxDropAmount: 1
-  baseSellPrice: 10
+  baseSellPrice: 30
   baseBuyPrice: 5
   canSell: 1
   isStackable: 1

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class ShopUIManager : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class ShopUIManager : MonoBehaviour
     [Header("Audio")]
     public AudioManagement audioManagement;
 
-    private InventoryController playerInventory;
+    // Đổi sang InventoryManager
+    private InventoryManager playerInventory;
     private CurrencyManager playerCurrency;
 
     private ItemData currentItemToSell;
@@ -28,6 +30,8 @@ public class ShopUIManager : MonoBehaviour
     private int currentItemQuantity = 0;
 
     private List<Slot> shopSlots = new List<Slot>();
+
+    private PlayerInput playerInput;
 
     private void Awake()
     {
@@ -51,18 +55,24 @@ public class ShopUIManager : MonoBehaviour
 
         if (confirmationDialog != null)
             confirmationDialog.SetActive(false);
+
         GameObject audioObject = GameObject.FindGameObjectWithTag("Audio");
         if (audioObject != null)
         {
             audioManagement = audioObject.GetComponent<AudioManagement>();
         }
+
+        playerInput = FindFirstObjectByType<PlayerInput>();
     }
 
     // Gọi từ ShopNPC
-    public void OpenShop(InventoryController inventory, CurrencyManager currency)
+    public void OpenShop(InventoryManager inventory, CurrencyManager currency)
     {
         this.playerInventory = inventory;
         this.playerCurrency = currency;
+
+        if (playerInput != null)
+            playerInput.enabled = false;
 
         CloneInventory();
         this.gameObject.SetActive(true);
@@ -70,29 +80,28 @@ public class ShopUIManager : MonoBehaviour
 
     private void CloseShopUI()
     {
+        if (playerInput != null)
+            playerInput.enabled = true;
+
         ShopNPC shopNPC = FindFirstObjectByType<ShopNPC>();
         if (shopNPC != null) shopNPC.CloseShop();
 
-        // reset confirmation dialog
         if (confirmationDialog != null)
             confirmationDialog.SetActive(false);
 
         this.gameObject.SetActive(false);
 
-        // reset trạng thái item hiện tại
         currentItemToSell = null;
         currentPlayerSlotIndex = -1;
         currentItemQuantity = 0;
         audioManagement.PlaySFX(audioManagement.CloseMenu);
     }
 
-
     /// <summary>
     /// Clone inventory thật sang shop panel
     /// </summary>
     private void CloneInventory()
     {
-        // Xóa clone cũ
         foreach (Transform c in shopInventoryPanel)
             Destroy(c.gameObject);
         shopSlots.Clear();
@@ -111,13 +120,11 @@ public class ShopUIManager : MonoBehaviour
                     var itemClone = Instantiate(itemUIPrefab, slotClone.transform).GetComponent<ItemUI>();
                     itemClone.Setup(itemUI.GetItemData(), itemUI.Amount);
 
-                    // Vô hiệu hóa drag/drop trong shop
-                    var dragHandler = itemClone.GetComponent<ItemUI>();
-                    if (dragHandler != null) dragHandler.enabled = false;
+                    var dragHandler = itemClone.GetComponent<ItemDragHandler>();
+                    if (dragHandler != null) Destroy(dragHandler);
 
                     slotClone.currentItem = itemClone.gameObject;
 
-                    // Gắn event click => ShowConfirmation
                     int slotIndex = i;
                     var btn = itemClone.gameObject.AddComponent<Button>();
                     btn.onClick.AddListener(() =>
@@ -149,21 +156,18 @@ public class ShopUIManager : MonoBehaviour
             if (confirmationText != null)
                 confirmationText.text = $"Sell {quantity} {currentItemToSell.itemName} for {sellPrice} coins?";
 
-            // đưa popup lên top
             confirmationDialog.transform.SetAsLastSibling();
         }
 
         audioManagement.PlaySFX(audioManagement.Select);
     }
 
-
-
     private void HideConfirmation()
     {
         if (confirmationDialog != null)
             confirmationDialog.SetActive(false);
 
-       audioManagement.PlaySFX(audioManagement.CloseMenu);
+        audioManagement.PlaySFX(audioManagement.CloseMenu);
     }
 
     private void ConfirmSell()
@@ -172,7 +176,6 @@ public class ShopUIManager : MonoBehaviour
 
         int sellPrice = currentItemToSell.baseSellPrice * currentItemQuantity;
 
-        // Thêm tiền cho người chơi
         if (playerCurrency != null)
         {
             playerCurrency.AddCoins(sellPrice);
@@ -199,8 +202,7 @@ public class ShopUIManager : MonoBehaviour
         currentPlayerSlotIndex = -1;
         currentItemQuantity = 0;
 
-       audioManagement.PlaySFX(audioManagement.SellItem);
+        audioManagement.PlaySFX(audioManagement.SellItem);
         Debug.Log($"Successfully sold item for {sellPrice} coins!");
     }
-
 }

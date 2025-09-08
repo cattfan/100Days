@@ -13,14 +13,14 @@ public class InventoryController : MonoBehaviour
     [SerializeField] private GameObject itemUIPrefab;
     [SerializeField] private int slotCount = 18;
 
+    [Header("All Available Items")]
+    public ItemData[] allItems;
 
     [Header("Start Items (optional)")]
     public ItemData[] startItems;
 
     private List<Slot> slots = new List<Slot>();
-    private ItemUI cursorItem;
-    private float lastClickTime = 0f;
-    public bool shopMode = false; // <- flag shop mode
+    public bool shopMode = false;
 
     private void Awake()
     {
@@ -39,20 +39,6 @@ public class InventoryController : MonoBehaviour
             {
                 if (data != null) AddItem(data, 1);
             }
-        }
-    }
-    private void Update()
-    {
-        if (cursorItem != null)
-        {
-            Vector2 pos;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                inventoryPanel.root as RectTransform,
-                Mouse.current.position.ReadValue(),
-                null,
-                out pos
-            );
-            cursorItem.GetComponent<RectTransform>().anchoredPosition = pos;
         }
     }
 
@@ -127,7 +113,6 @@ public class InventoryController : MonoBehaviour
 
     public void RemoveItem(ItemData data, int amount)
     {
-        // Find the first slot with the item
         var slotToRemoveFrom = slots.FirstOrDefault(s => s.currentItem != null && s.currentItem.GetComponent<ItemUI>().GetItemData() == data);
 
         if (slotToRemoveFrom != null)
@@ -143,7 +128,6 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    // New public method to remove an item by slot index
     public void RemoveItemAtSlot(int index)
     {
         if (index >= 0 && index < slots.Count)
@@ -157,48 +141,21 @@ public class InventoryController : MonoBehaviour
         }
     }
 
+    // SIMPLIFIED CLICK HANDLING - Only for shop mode
     public void HandleSlotClick(Slot slot, PointerEventData.InputButton button)
     {
-        if (button == PointerEventData.InputButton.Left)
+        if (shopMode && slot.currentItem != null)
         {
-            HandleLeftClick(slot);
-        }
-        else if (button == PointerEventData.InputButton.Right)
-        {
-            HandleRightClick(slot);
-        }
-    }
-
-    private void HandleLeftClick(Slot slot)
-    {
-        if (cursorItem == null)
-        {
-            if (slot.currentItem != null)
+            var itemUI = slot.currentItem.GetComponent<ItemUI>();
+            if (itemUI != null)
             {
-                cursorItem = slot.currentItem.GetComponent<ItemUI>();
-                cursorItem.transform.SetParent(inventoryPanel.root, true);
-                slot.currentItem = null;
-            }
-        }
-        else
-        {
-            if (slot.currentItem == null)
-            {
-                slot.currentItem = cursorItem.gameObject;
-                cursorItem.transform.SetParent(slot.transform);
-                cursorItem.transform.localPosition = Vector3.zero;
-                cursorItem = null;
-            }
-            else
-            {
-                var slotUI = slot.currentItem.GetComponent<ItemUI>();
-                if (slotUI.GetItemData() == cursorItem.GetItemData() && slotUI.GetItemData().isStackable)
+                var shopUI = FindFirstObjectByType<ShopUIManager>();
+                if (shopUI != null)
                 {
-                    int moveAmount = cursorItem.Amount;
-                    slotUI.AddAmount(moveAmount);
-                    Destroy(cursorItem.gameObject);
-                    cursorItem = null;
+                    int slotIndex = GetSlots().IndexOf(slot);
+                    shopUI.ShowConfirmation(itemUI.GetItemData(), itemUI.Amount, slotIndex);
                 }
+<<<<<<< HEAD
                 else
                 {
                     var temp = slot.currentItem;
@@ -270,6 +227,8 @@ public class InventoryController : MonoBehaviour
 
                 cursorItem.AddAmount(-1);
                 if (cursorItem.Amount <= 0) { Destroy(cursorItem.gameObject); cursorItem = null; }
+=======
+>>>>>>> origin/main
             }
         }
     }
@@ -283,6 +242,7 @@ public class InventoryController : MonoBehaviour
     {
         return inventoryPanel;
     }
+
     public void OnSlotClicked(Slot slot)
     {
         if (slot == null || slot.currentItem == null) return;
@@ -300,11 +260,158 @@ public class InventoryController : MonoBehaviour
                 shopUI.ShowConfirmation(itemUI.GetItemData(), itemUI.Amount, slotIndex);
             }
         }
+    }
+
+    // SAVE/LOAD METHODS
+    public List<InventoryItemData> GetInventoryData()
+    {
+        List<InventoryItemData> inventoryData = new List<InventoryItemData>();
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            var slot = slots[i];
+            if (slot.currentItem != null)
+            {
+                var itemUI = slot.currentItem.GetComponent<ItemUI>();
+                if (itemUI != null && itemUI.GetItemData() != null)
+                {
+                    var inventoryItem = new InventoryItemData(
+                        itemUI.GetItemData().name,
+                        itemUI.Amount,
+                        i
+                    );
+                    inventoryData.Add(inventoryItem);
+                }
+            }
+        }
+
+        Debug.Log($"GetInventoryData: Found {inventoryData.Count} items");
+        return inventoryData;
+    }
+
+    public void LoadInventoryData(List<InventoryItemData> inventoryData)
+    {
+        ClearInventory();
+
+        if (inventoryData == null || inventoryData.Count == 0)
+        {
+            Debug.Log("No inventory data to load");
+            return;
+        }
+
+        foreach (var item in inventoryData)
+        {
+            ItemData itemData = FindItemDataByName(item.itemName);
+            if (itemData != null && item.slotIndex >= 0 && item.slotIndex < slots.Count)
+            {
+                var targetSlot = slots[item.slotIndex];
+                if (targetSlot.currentItem == null)
+                {
+                    CreateItemAtSlot(itemData, item.amount, item.slotIndex);
+                }
+                else
+                {
+                    AddItem(itemData, item.amount);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Could not load item: {item.itemName}");
+            }
+        }
+
+        Debug.Log($"LoadInventoryData: Loaded {inventoryData.Count} items");
+    }
+
+    public void ClearInventory()
+    {
+        foreach (var slot in slots)
+        {
+            if (slot.currentItem != null)
+            {
+                Destroy(slot.currentItem);
+                slot.currentItem = null;
+            }
+        }
+        Debug.Log("Inventory cleared");
+    }
+
+    private void CreateItemAtSlot(ItemData data, int amount, int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= slots.Count) return;
+
+        var slot = slots[slotIndex];
+        if (slot.currentItem != null) return;
+
+        var itemGO = Instantiate(itemUIPrefab, slot.transform);
+        var rt = itemGO.GetComponent<RectTransform>();
+        if (rt != null)
+        {
+            rt.anchoredPosition = Vector2.zero;
+            rt.localScale = Vector3.one;
+        }
+
+        var uiComp = itemGO.GetComponent<ItemUI>();
+        if (uiComp != null)
+        {
+            uiComp.Setup(data, amount);
+            slot.currentItem = itemGO;
+        }
         else
         {
+<<<<<<< HEAD
             // Always treat as Left click
             HandleSlotClick(slot, PointerEventData.InputButton.Left);
+=======
+            Destroy(itemGO);
+>>>>>>> origin/main
         }
     }
 
+    private ItemData FindItemDataByName(string itemName)
+    {
+        if (allItems != null)
+        {
+            foreach (var item in allItems)
+            {
+                if (item != null && item.name == itemName)
+                    return item;
+            }
+        }
+        return null;
+    }
+
+    public int GetTotalItemCount()
+    {
+        int count = 0;
+        foreach (var slot in slots)
+        {
+            if (slot.currentItem != null)
+            {
+                var itemUI = slot.currentItem.GetComponent<ItemUI>();
+                if (itemUI != null)
+                {
+                    count += itemUI.Amount;
+                }
+            }
+        }
+        return count;
+    }
+
+    public bool HasItem(string itemName)
+    {
+        foreach (var slot in slots)
+        {
+            if (slot.currentItem != null)
+            {
+                var itemUI = slot.currentItem.GetComponent<ItemUI>();
+                if (itemUI != null && itemUI.GetItemData() != null &&
+                    itemUI.GetItemData().name == itemName)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

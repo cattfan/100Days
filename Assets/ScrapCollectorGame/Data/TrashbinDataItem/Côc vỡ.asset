@@ -16,11 +16,11 @@ MonoBehaviour:
   description: Item description
   itemIcon: {fileID: -3732252094069606516, guid: f6ce26b80373cf2498c0918d68313bd3, type: 3}
   itemID: 13
-  rarity: 0
-  dropRate: 50
+  rarity: 3
+  dropRate: 12.1
   minDropAmount: 1
   maxDropAmount: 1
-  baseSellPrice: 10
+  baseSellPrice: 100
   baseBuyPrice: 5
   canSell: 1
   isStackable: 1
