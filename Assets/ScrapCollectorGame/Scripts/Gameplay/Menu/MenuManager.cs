@@ -1,25 +1,51 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
+    [Header("Menus")]
+    public GameObject mainMenu;          // giao diện menu chính
+    public GameObject optionMenu;        // giao diện option setting
+
+    private void Start()
+    {
+        // Khi game bắt đầu: MainMenu bật, OptionMenu tắt
+        mainMenu.SetActive(true);
+        optionMenu.SetActive(false);
+    }
+
     public void PlayGame()
     {
-        SceneManager.LoadScene("Maingame");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Maingame");
         Time.timeScale = 1f;
+    }
+
+    public void SettingGame()
+    {
+        mainMenu.SetActive(false);
+        optionMenu.SetActive(true);
+    }
+
+    public void LoadGameButton()
+    {
+        PlayerPrefs.SetString("SaveToLoad", "save1");   // chọn file cần load
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Maingame");
+    }
+
+    public void BackToMainMenu()
+    {
+        optionMenu.SetActive(false);
+        mainMenu.SetActive(true);
     }
 
     public void QuitGame()
     {
         Debug.Log("Quit Game");
-
-        // Dòng này chỉ hoạt động khi game đã được build
         Application.Quit();
 
-        // Dòng này dùng để dừng chạy game trong Unity Editor
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        #endif
-
+#endif
     }
+
+
 }

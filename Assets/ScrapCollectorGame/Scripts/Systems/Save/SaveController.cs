@@ -6,77 +6,79 @@ public class SaveController : MonoBehaviour
 {
     [Header("References")]
     public Transform player;
-    public CurrencyManager currencyManager;           // Tham chiếu đến script quản lý tiền
-    public ThanhTheLucplayer playerEnergyManager;     // ✅ Thay đổi: sử dụng ThanhTheLucplayer thay vì ThanhTheLuc
-    public InventoryController inventoryController;   // Tham chiếu đến InventoryController
+    public CurrencyManager currencyManager;
+    public ThanhTheLucplayer playerEnergyManager;
+    public InventoryController inventoryController;
 
-    private string customPath;
+    private string saveFolder;
 
-    void Start()
+    // ✅ HÀM WRAPPER CHO BUTTON
+    public void SaveDefaultGame()
     {
-        customPath = Path.Combine(Application.persistentDataPath, "savegame.json");
-        Debug.Log("Custom Save Path: " + customPath);
+        SaveGame("save1");
     }
 
-    public void SaveGame()
+    public void LoadDefaultGame()
     {
-        // Kiểm tra tham chiếu
+        LoadGame("save1");
+    }
+
+    // Lưu game với tên file
+    public void SaveGame(string saveName)
+    {
         if (player == null || currencyManager == null || playerEnergyManager == null || inventoryController == null)
         {
-            Debug.LogError("Missing references! Please assign Player, CurrencyManager, ThanhTheLucplayer, and InventoryController in inspector.");
+            Debug.LogError("Missing references!");
             return;
         }
 
-        // Lấy dữ liệu inventory
         List<InventoryItemData> inventoryData = inventoryController.GetInventoryData();
 
-        // ✅ Lấy thể lực từ ThanhTheLucplayer
         SaveData data = new SaveData(
             playerPosition: player.position,
             playerRotation: player.rotation,
-            playerEnergy: playerEnergyManager.luongtheluchientai,    // ✅ Lấy từ ThanhTheLucplayer
+            playerEnergy: playerEnergyManager.luongtheluchientai,
             playerCurrency: currencyManager.GetCoins(),
             inventoryItems: inventoryData
         );
 
         string json = JsonUtility.ToJson(data, true);
+        string path = Path.Combine(saveFolder, saveName + ".json");
 
-        try
-        {
-            File.WriteAllText(customPath, json);
-            Debug.Log("Game saved successfully at: " + customPath);
-            Debug.Log($"Saved - Health: {playerEnergyManager.luongtheluchientai}/{playerEnergyManager.luongtheluctoida}, Currency: {currencyManager.GetCoins()}, Items: {inventoryData.Count}");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError("Failed to save game: " + e.Message);
-        }
+        File.WriteAllText(path, json);
+        Debug.Log("Game saved: " + path);
     }
 
-    public void LoadGame()
+    // Load game từ file cụ thể
+    public void LoadGame(string saveName)
     {
-        if (File.Exists(customPath))
+        string path = Path.Combine(saveFolder, saveName + ".json");
+
+        if (File.Exists(path))
         {
-            try
-            {
-                string json = File.ReadAllText(customPath);
-                SaveData data = JsonUtility.FromJson<SaveData>(json);
-
-                // Áp dụng dữ liệu vào game
-                ApplyLoadedData(data);
-
-                Debug.Log("Game loaded successfully");
-                Debug.Log($"Loaded - Health: {data.playerEnergy}, Currency: {data.playerCurrency}, Items: {data.inventoryItems?.Count ?? 0}");
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError("Failed to load game: " + e.Message);
-            }
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+            ApplyLoadedData(data);
+            Debug.Log("Game loaded: " + saveName);
         }
         else
         {
-            Debug.LogWarning("No save file found at: " + customPath);
+            Debug.LogWarning("Save file not found: " + saveName);
         }
+    }
+
+    // Lấy danh sách tất cả file save
+    public List<string> GetAllSaveFiles()
+    {
+        List<string> saveFiles = new List<string>();
+        if (Directory.Exists(saveFolder))
+        {
+            foreach (var file in Directory.GetFiles(saveFolder, "*.json"))
+            {
+                saveFiles.Add(Path.GetFileNameWithoutExtension(file));
+            }
+        }
+        return saveFiles;
     }
 
     private void ApplyLoadedData(SaveData data)
@@ -87,74 +89,32 @@ public class SaveController : MonoBehaviour
             return;
         }
 
-        // Áp dụng vị trí và rotation của player
         player.position = data.playerPosition;
         player.rotation = data.playerRotation;
-
-        // ✅ Áp dụng thể lực vào ThanhTheLucplayer
         playerEnergyManager.SetEnergy(data.playerEnergy);
 
-        // Áp dụng tiền - Reset về 0 trước, sau đó add số tiền đã lưu
-        ResetCurrency();
-        if (data.playerCurrency > 0)
-        {
-            currencyManager.AddCoins(data.playerCurrency);
-        }
-
-        // Áp dụng inventory
-        inventoryController.LoadInventoryData(data.inventoryItems);
-
-        Debug.Log($"Applied loaded data - Health: {data.playerEnergy}/{playerEnergyManager.luongtheluctoida}, Currency: {data.playerCurrency}, Items: {data.inventoryItems?.Count ?? 0}");
-    }
-
-    // Reset tiền về 0
-    private void ResetCurrency()
-    {
         currencyManager.ResetCoins();
-    }
+        if (data.playerCurrency > 0) currencyManager.AddCoins(data.playerCurrency);
 
-    // ✅ Wrapper methods để tương tác với ThanhTheLucplayer - NĂNG LƯỢNG
-    public void UseEnergy(float amount)
+        inventoryController.LoadInventoryData(data.inventoryItems);
+    }
+    void Start()
     {
-        if (playerEnergyManager != null)
+        // Tạo thư mục lưu game nếu chưa có
+        saveFolder = Path.Combine(Application.persistentDataPath, "Saves");
+        if (!Directory.Exists(saveFolder))
         {
-            playerEnergyManager.TruTheLuc(amount);
-            Debug.Log($"Player used {amount} energy. Current energy: {playerEnergyManager.luongtheluchientai}");
+            Directory.CreateDirectory(saveFolder);
+        }
+
+        // 🔑 Đọc tên file cần load từ PlayerPrefs
+        string saveName = PlayerPrefs.GetString("SaveToLoad", "");
+
+        if (!string.IsNullOrEmpty(saveName))
+        {
+            LoadGame(saveName); // Load dữ liệu
+            PlayerPrefs.DeleteKey("SaveToLoad"); // Xóa key để không tự load lại lần sau
         }
     }
 
-    public void RestoreEnergy(float amount)
-    {
-        if (playerEnergyManager != null)
-        {
-            playerEnergyManager.AddEnergy(amount);
-            Debug.Log($"Player restored {amount} energy. Current energy: {playerEnergyManager.luongtheluchientai}");
-        }
-    }
-
-    public float GetCurrentEnergy()
-    {
-        return playerEnergyManager != null ? playerEnergyManager.luongtheluchientai : 0f;
-    }
-
-    public float GetMaxEnergy()
-    {
-        return playerEnergyManager != null ? playerEnergyManager.luongtheluctoida : 100f;
-    }
-
-    // Kiểm tra xem có save file không
-    public bool HasSaveFile()
-    {
-        return File.Exists(customPath);
-    }
-
-    // Xóa save file
-    public void DeleteSaveFile()
-    {
-        if (File.Exists(customPath))
-        {
-            File.Delete(customPath);
-            Debug.Log("Save file deleted");
-        }
-    }
 }
