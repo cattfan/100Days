@@ -178,7 +178,7 @@ public class Trashbin : MonoBehaviour, IInteractable
             if (selectedItemData != null)
             {
                 // Tạo item sử dụng ItemPickup system
-                GameObject droppedItem = ItemPickup.CreateDrop(selectedItemData, transform.position, itemPickupPrefab);
+                GameObject droppedItem = ItemDropFactory.CreateDrop(selectedItemData, transform.position, itemPickupPrefab);
 
                 if (droppedItem != null)
                 {
