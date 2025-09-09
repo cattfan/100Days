@@ -19,10 +19,23 @@ public class SaveController : MonoBehaviour
     {
         // Tạo tên file dựa trên playerName
         string fileName = string.IsNullOrEmpty(playerName) ? "Player" : playerName;
-        fileName = SanitizeFileName(fileName); // Làm sạch tên file
+        fileName = SanitizeFileName(fileName);
         customPath = Path.Combine(Application.persistentDataPath, $"{fileName}_save.json");
         Debug.Log("Custom Save Path: " + customPath);
+
+        // 🔑 Kiểm tra xem có yêu cầu load từ MainMenu không
+        string saveToLoad = PlayerPrefs.GetString("SaveToLoad", "");
+        if (!string.IsNullOrEmpty(saveToLoad))
+        {
+            // Gán playerName theo file lưu từ MainMenu
+            SetPlayerName(saveToLoad);
+            LoadGame();
+
+            // Xóa key để tránh load lại khi restart
+            PlayerPrefs.DeleteKey("SaveToLoad");
+        }
     }
+
 
     // Làm sạch tên file, loại bỏ ký tự không hợp lệ
     private string SanitizeFileName(string fileName)
