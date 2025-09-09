@@ -1,8 +1,10 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ItemUI : MonoBehaviour
+// ItemUI.cs: Xử lý hành vi kéo và thả của vật phẩm
+public class ItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("UI refs (assign in prefab)")]
     public Image icon;
@@ -11,7 +13,6 @@ public class ItemUI : MonoBehaviour
     private ItemData itemData;
     private int amount = 1;
 
-<<<<<<< HEAD
     // Biến giúp theo dõi trạng thái
     public Transform originalParent { get; private set; }
     private RectTransform inventoryPanelRect;
@@ -33,8 +34,6 @@ public class ItemUI : MonoBehaviour
         audioManager = FindFirstObjectByType<AudioManagement>();
     }
 
-=======
->>>>>>> origin/main
     public void Setup(ItemData data, int qty = 1)
     {
         itemData = data;
@@ -55,15 +54,11 @@ public class ItemUI : MonoBehaviour
         UpdateAmountUI();
     }
 
-    private void UpdateAmountUI()
+    void UpdateAmountUI()
     {
         if (amountText == null) return;
 
-        if (itemData == null)
-        {
-            amountText.text = "";
-            return;
-        }
+        if (itemData == null) { amountText.text = ""; return; }
 
         if (amount > 1)
         {
@@ -71,14 +66,15 @@ public class ItemUI : MonoBehaviour
         }
         else
         {
-            // Non-stackable thì luôn hiện 1, stackable có 1 thì ẩn
-            if (itemData.isStackable)
+            // Nếu stackable và chỉ có 1 thì ẩn
+            if (itemData.isStackable && amount > 1)
+            {
                 amountText.text = "";
+            }
             else
-                amountText.text = "";
+                amountText.text = ""; // Non-stackable thì luôn hiện 1
         }
     }
-<<<<<<< HEAD
 
 
     // ---- Drag handlers ----
@@ -164,6 +160,3 @@ public class ItemUI : MonoBehaviour
         controller.HandleSlotClick(slot, eventData.button);
     }
 }
-=======
-}
->>>>>>> origin/main

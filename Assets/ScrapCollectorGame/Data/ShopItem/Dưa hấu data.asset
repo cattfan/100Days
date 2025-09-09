@@ -26,9 +26,5 @@ MonoBehaviour:
   baseBuyPrice: 5
   canSell: 0
   isStackable: 1
-<<<<<<< HEAD
   maxStackSize: 10
-=======
-  maxStackSize: 1
->>>>>>> origin/main
   pickupDelay: 999

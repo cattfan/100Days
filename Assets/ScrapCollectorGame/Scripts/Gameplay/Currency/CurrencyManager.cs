@@ -25,24 +25,8 @@ public class CurrencyManager : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
 
 
-=======
-    // Thêm hàm để reset coins về 0 (cho LoadGame)
-    public void ResetCoins()
-    {
-        coins = 0;
-        UpdateCoinText();
-    }
-
-    // Thêm hàm để set coins trực tiếp (alternative cho ResetCoins + AddCoins)
-    public void SetCoins(int amount)
-    {
-        coins = Mathf.Max(0, amount); // Đảm bảo không âm
-        UpdateCoinText();
-    }
->>>>>>> origin/main
 
     void Start()
     {
@@ -54,18 +38,11 @@ public class CurrencyManager : MonoBehaviour
         // Test function: Press 'T' to add 10 coins
         if (Keyboard.current.tKey.wasPressedThisFrame)
         {
-<<<<<<< HEAD
             AddCoins(10);
             Debug.Log("Đã thêm 10 coins");
         }
 
         // Test function: Press 'G' to spend 5 coins
-=======
-            AddCoins(1000000000); // tăng 10 coins
-            Debug.Log("Đã thêm 10 coins");
-        }
-        // Test giảm tiền khi nhấn phím G
->>>>>>> origin/main
         if (Keyboard.current.gKey.wasPressedThisFrame)
         {
             SpendCoins(5);
@@ -84,17 +61,16 @@ public class CurrencyManager : MonoBehaviour
         UpdateCoinText();
     }
 
-    public bool SpendCoins(int amount)
+    public void SpendCoins(int amount)
     {
         if (coins >= amount)
         {
             coins -= amount;
             UpdateCoinText();
-            return true; // Thành công
         }
         else
         {
-            return false; // Không đủ tiền
+            Debug.Log("Không đủ tiền để mua!");
         }
     }
 
@@ -102,11 +78,7 @@ public class CurrencyManager : MonoBehaviour
     {
         if (coinText != null)
         {
-<<<<<<< HEAD
             coinText.text = ": " + coins.ToString();
-=======
-            coinText.text = ": " + coins;
->>>>>>> origin/main
         }
     }
 }

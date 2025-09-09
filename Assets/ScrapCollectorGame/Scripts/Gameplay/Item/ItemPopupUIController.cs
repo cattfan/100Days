@@ -13,9 +13,6 @@ public class ItemPickupUIController : MonoBehaviour
     public int maxPopups = 5;
     public float popupDuration = 3f;
 
-    public GameObject popupFullInventory;
-    public float fullInventoryDuration = 2f;
-
     private readonly Queue<GameObject> activePopups = new Queue<GameObject>();
 
     void Awake()
@@ -121,61 +118,4 @@ public class ItemPickupUIController : MonoBehaviour
         Debug.Log("[ItemPickupUI] Xoá popup sau khi fade out.");
         Destroy(popup);
     }
-    public void ShowWarningPopup(string message, float duration = 2f)
-    {
-        if (popupFullInventory == null)
-        {
-            Debug.LogError("[ItemPickupUI] popupFullInventory chưa được gán trong Inspector!");
-            return;
-        }
-
-        GameObject newPopup = Instantiate(popupFullInventory, transform);
-        if (newPopup == null)
-        {
-            Debug.LogError("[ItemPickupUI] Instantiate popupFullInventory thất bại!");
-            return;
-        }
-
-        TMP_Text text = newPopup.GetComponentInChildren<TMP_Text>();
-        if (text != null)
-        {
-            text.text = message; // 👈 chỉ đổi text theo tham số truyền vào
-        }
-
-        activePopups.Enqueue(newPopup);
-
-        if (activePopups.Count > maxPopups)
-        {
-            GameObject removed = activePopups.Dequeue();
-            Destroy(removed);
-        }
-
-        // ⏳ Fade out sau thời gian quy định
-        StartCoroutine(FadeOutAndDestroyWarning(newPopup, duration));
-    }
-
-    private IEnumerator FadeOutAndDestroyWarning(GameObject popup, float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        if (popup == null) yield break;
-
-        CanvasGroup canvasGroup = popup.GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-        {
-            Destroy(popup);
-            yield break;
-        }
-
-        for (float timePassed = 0f; timePassed < 1f; timePassed += Time.deltaTime)
-        {
-            if (popup == null) yield break;
-            canvasGroup.alpha = 1f - timePassed;
-            yield return null;
-        }
-
-        Destroy(popup);
-    }
-
-
-
 }
