@@ -20,9 +20,9 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
         parentCanvas = GetComponentInParent<Canvas>();
-        audioManager = FindObjectOfType<AudioManagement>();
+        audioManager = Object.FindFirstObjectByType<AudioManagement>();
 
-        var inventoryController = FindObjectOfType<InventoryManager>();
+        var inventoryController = Object.FindFirstObjectByType<InventoryManager>();
         if (inventoryController != null)
             inventoryPanelRect = inventoryController.GetInventoryPanel();
     }
@@ -117,7 +117,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         // Only handle clicks for shop mode
         var slot = GetComponentInParent<Slot>();
-        var controller = FindObjectOfType<InventoryInteraction>();
+        var controller = Object.FindFirstObjectByType<InventoryInteraction>();
 
         if (controller != null && slot != null && controller.shopMode)
         {

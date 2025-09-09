@@ -11,7 +11,7 @@ public class Slot : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     private void Start()
     {
-        inventoryManager = FindObjectOfType<InventoryManager>();
+        inventoryManager = Object.FindFirstObjectByType<InventoryManager>();
     }
 
     public void OnDrop(PointerEventData eventData)
