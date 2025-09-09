@@ -144,7 +144,7 @@ public class ItemPickup : MonoBehaviour
        
 
         // ✅ Thử thêm trực tiếp vào inventory - KHÔNG kiểm tra trước
-        InventoryManager inv = FindObjectOfType<InventoryManager>();
+        InventoryManager inv = Object.FindFirstObjectByType<InventoryManager>();
         if (inv != null)
         {
             bool added = inv.AddItem(itemData, currentAmount);
