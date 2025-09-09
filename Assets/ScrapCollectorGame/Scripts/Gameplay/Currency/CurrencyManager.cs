@@ -75,4 +75,10 @@ public class CurrencyManager : MonoBehaviour
             coinText.text = ": " + coins;
         }
     }
+
+    public void BackMenu()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Mainmenu");
+        Time.timeScale = 1f;
+    }
 }
