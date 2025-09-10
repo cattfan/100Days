@@ -161,6 +161,7 @@ public class ItemPickup : MonoBehaviour
                 // ❌ Nếu add thất bại
                 Debug.Log("❌ Failed to add item to inventory!");
                 audioHandler?.PlayCannotPickupSound();
+
                 // KHÔNG destroy item
             }
         }
