@@ -60,7 +60,14 @@ public class GachaNPC : MonoBehaviour, IInteractable
         var currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
         if (currencyManager != null)
         {
-            currencyManager.SpendCoins(100); // Mỗi lần mở tốn 5 coins
+            int coint = currencyManager.GetCoins();
+            if (coint < 100)
+            {
+                ItemPickupUIController.Instance.ShowWarningPopup("Bạn cần ít nhất 100 xu để quay Gacha!");
+                DialogUi.SetActive(false);
+                playerInput.enabled = true;
+                return;
+            }
         }
         else
         {
