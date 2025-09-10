@@ -1,57 +1,104 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using TMPro;
 
-public class ItemUI : MonoBehaviour
+public class ItemUI : MonoBehaviour, IPointerClickHandler
 {
-    [Header("UI refs (assign in prefab)")]
-    public Image icon;
-    public TextMeshProUGUI amountText;
-
+    // Cần khai báo các biến này ở đây để chúng có thể được truy cập bởi tất cả các phương thức.
     private ItemData itemData;
-    private int amount = 1;
+    private int amount;
 
-    public void Setup(ItemData data, int qty = 1)
+    // Sử dụng [SerializeField] để gán trong Unity Inspector.
+    [SerializeField] private Image itemIcon;
+    [SerializeField] private TextMeshProUGUI amountText;
+
+    // Getter để các script khác có thể truy cập ItemData
+    public ItemData GetItemData()
+    {
+        return itemData;
+    }
+
+    // Getter cho biến amount
+    public int Amount
+    {
+        get { return amount; }
+    }
+
+    public void Setup(ItemData data, int count)
     {
         itemData = data;
-        amount = Mathf.Max(1, qty);
+        amount = count;
 
-        if (icon != null && data != null)
-            icon.sprite = data.itemIcon;
+        if (itemIcon != null && data.itemIcon != null)
+        {
+            itemIcon.sprite = data.itemIcon;
+            itemIcon.color = data.GetRarityColor();
+        }
 
-        UpdateAmountUI();
+        UpdateAmountText();
     }
 
-    public ItemData GetItemData() => itemData;
-    public int Amount => amount;
-
-    public void AddAmount(int v)
+    public void AddAmount(int value)
     {
-        amount += v;
-        UpdateAmountUI();
+        amount += value;
+        if (amount < 0)
+        {
+            amount = 0;
+        }
+
+        UpdateAmountText();
+
+        if (amount == 0)
+        {
+            Destroy(gameObject);
+        }
     }
 
-    private void UpdateAmountUI()
+    private void UpdateAmountText()
     {
-        if (amountText == null) return;
+        if (amountText != null)
+        {
+            amountText.text = amount > 1 ? amount.ToString() : "";
+        }
+    }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            UseItem();
+        }
+    }
+
+    private void UseItem()
+    {
         if (itemData == null)
         {
-            amountText.text = "";
+            Debug.LogError("ItemData is null. Cannot use item.");
             return;
         }
 
-        if (amount > 1)
+        if (itemData.isFood)
         {
-            amountText.text = amount.ToString();
+            // Fix lỗi bằng cách sử dụng FindAnyObjectByType
+            ThanhTheLucplayer playerStamina = FindAnyObjectByType<ThanhTheLucplayer>();
+
+            if (playerStamina != null)
+            {
+                playerStamina.AddEnergy(itemData.staminaRestoreAmount);
+                Debug.Log($"Đã dùng {itemData.itemName}. Hồi {itemData.staminaRestoreAmount} thể lực.");
+
+                AddAmount(-1);
+            }
+            else
+            {
+                Debug.LogWarning("Không tìm thấy ThanhTheLucplayer trong Scene!");
+            }
         }
         else
         {
-            // Non-stackable thì luôn hiện 1, stackable có 1 thì ẩn
-            if (itemData.isStackable)
-                amountText.text = "";
-            else
-                amountText.text = "";
+            Debug.Log("Vật phẩm này không thể ăn được.");
         }
     }
 }
