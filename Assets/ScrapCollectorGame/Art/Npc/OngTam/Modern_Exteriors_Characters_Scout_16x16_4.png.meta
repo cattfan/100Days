@@ -11718,7 +11718,7 @@ TextureImporter:
         width: 16
         height: 25
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -11740,7 +11740,7 @@ TextureImporter:
         width: 16
         height: 26
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -11749,6 +11749,28 @@ TextureImporter:
       bones: []
       spriteID: 7682755cf8845c34d85f0add48396ab9
       internalID: 1574510097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Modern_Exteriors_Characters_Scout_16x16_4_466
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 425
+        width: 231
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 580e78db76bf8ff4fa005790cac92a16
+      internalID: 1301114721
       vertices: []
       indices: 
       edges: []
@@ -12175,6 +12197,7 @@ TextureImporter:
       Modern_Exteriors_Characters_Scout_16x16_4_463: -5512067392355233357
       Modern_Exteriors_Characters_Scout_16x16_4_464: -1234390087
       Modern_Exteriors_Characters_Scout_16x16_4_465: 1574510097
+      Modern_Exteriors_Characters_Scout_16x16_4_466: 1301114721
       Modern_Exteriors_Characters_Scout_16x16_4_47: -7709303688538771863
       Modern_Exteriors_Characters_Scout_16x16_4_48: -8336988002918093813
       Modern_Exteriors_Characters_Scout_16x16_4_49: 349993256714144315

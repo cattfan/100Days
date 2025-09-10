@@ -73,7 +73,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b69b83d7277543941b8b921ec9f5593f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  icon: {fileID: 6845863219495011611}
+  itemIcon: {fileID: 6845863219495011611}
   amountText: {fileID: 6731754929626992373}
 --- !u!114 &163574288667133111
 MonoBehaviour:
@@ -87,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 586fe6c5ca956bb47af3b2aef72e11f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  originalParent: {fileID: 0}
+  originalParent: {fileID: 9016125199444096508}
   droppedOnValidSlot: 0
 --- !u!1 &6811175853212229273
 GameObject:
