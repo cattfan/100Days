@@ -16,6 +16,8 @@ MonoBehaviour:
   description: "T\xE1o \u0111\u1ECF"
   itemIcon: {fileID: -9213056636207805707, guid: 17147171d53794443adec46db735f571, type: 3}
   itemID: 16
+  isFood: 1
+  staminaRestoreAmount: 30
   rarity: 0
   dropRate: 50
   minDropAmount: 1
@@ -24,5 +26,5 @@ MonoBehaviour:
   baseBuyPrice: 5
   canSell: 0
   isStackable: 1
-  maxStackSize: 1
+  maxStackSize: 10
   pickupDelay: 999

@@ -16,3 +16,5 @@ MonoBehaviour:
   itemIcon: {fileID: -9182177788924653191, guid: 28dfafc90c5b6634ab7fd07fa889a7e0, type: 3}
   itemCost: 25
   itemData: {fileID: 11400000, guid: 41da637f1d6534b438cee4d2bf76ad8a, type: 2}
+  canBeConsumed: 1
+  staminaRestoreAmount: 30

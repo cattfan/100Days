@@ -7,4 +7,11 @@ public class ShopItem : ScriptableObject
     public Sprite itemIcon;
     public int itemCost;
     public ItemData itemData; // Cần có dòng này
+                              // Trong file ItemData.cs
+
+    // Trong file ItemData.cs
+
+    [Header("Consumption Properties")]
+    public bool canBeConsumed = false;
+    public float staminaRestoreAmount = 0f;
 }

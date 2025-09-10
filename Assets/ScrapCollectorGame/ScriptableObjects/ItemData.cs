@@ -19,7 +19,9 @@ public class ItemData : ScriptableObject
     public string description = "Item description";
     public Sprite itemIcon;
     public int itemID;
-
+    [Header("Food Properties")]
+    public bool isFood = false;
+    public float staminaRestoreAmount = 0f;
     [Header("Rarity & Drop System")]
     public ItemRarity rarity = ItemRarity.Common;
     [Range(0f, 100f)]
