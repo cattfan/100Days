@@ -39,5 +39,9 @@ public class ItemSlotUI : MonoBehaviour
         {
             shopManager.BuyItem(itemData);
         }
+        else
+        {
+            Debug.LogError("ItemSlotUI: itemData hoặc shopManager bị null!");
+        }
     }
 }

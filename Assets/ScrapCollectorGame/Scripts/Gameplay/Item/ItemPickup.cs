@@ -144,7 +144,7 @@ public class ItemPickup : MonoBehaviour
        
 
         // ✅ Thử thêm trực tiếp vào inventory - KHÔNG kiểm tra trước
-        InventoryManager inv = Object.FindFirstObjectByType<InventoryManager>();
+        Inventory inv = Object.FindFirstObjectByType<Inventory>();
         if (inv != null)
         {
             bool added = inv.AddItem(itemData, currentAmount);
@@ -153,6 +153,7 @@ public class ItemPickup : MonoBehaviour
             {
                 // 🟢 Nếu add thành công thì Destroy
                 Debug.Log($"✅ Successfully added {itemData.itemName} to inventory!");
+                ItemPickupUIController.Instance?.ShowItemPickup(itemData.itemName, itemData.itemIcon);
                 audioHandler?.PlayPickupSound();
                 Destroy(gameObject);
             }

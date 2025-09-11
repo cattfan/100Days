@@ -22,8 +22,7 @@ public class ShopUIManager : MonoBehaviour
     public AudioManagement audioManagement;
 
     // Đổi sang InventoryManager
-    private InventoryManager playerInventory;
-    private CurrencyManager playerCurrency;
+    private Inventory playerInventory;
 
     private ItemData currentItemToSell;
     private int currentPlayerSlotIndex = -1;
@@ -66,10 +65,9 @@ public class ShopUIManager : MonoBehaviour
     }
 
     // Gọi từ ShopNPC
-    public void OpenShop(InventoryManager inventory, CurrencyManager currency)
+    public void OpenShop(Inventory inventory)
     {
         this.playerInventory = inventory;
-        this.playerCurrency = currency;
 
         if (playerInput != null)
             playerInput.enabled = false;
@@ -175,13 +173,16 @@ public class ShopUIManager : MonoBehaviour
         if (currentItemToSell == null || currentPlayerSlotIndex == -1) return;
 
         int sellPrice = currentItemToSell.baseSellPrice * currentItemQuantity;
-
-        if (playerCurrency != null)
+        SaveController saveController = FindFirstObjectByType<SaveController>();
+        if (saveController != null && saveController.currencyManager != null)
         {
-            playerCurrency.AddCoins(sellPrice);
-            Debug.Log($"Added {sellPrice} coins to player.");
+            saveController.currencyManager.AddCoins(sellPrice);
+            Debug.Log($"Added {sellPrice} coins via SaveController's CurrencyManager");
         }
-
+        else
+        {
+            Debug.LogError("Could not find SaveController or its CurrencyManager!");
+        }
         // Xóa item trong inventory thật
         playerInventory.RemoveItemAtSlot(currentPlayerSlotIndex);
 

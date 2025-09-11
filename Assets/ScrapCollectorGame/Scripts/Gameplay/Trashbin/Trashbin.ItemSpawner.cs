@@ -40,7 +40,7 @@ namespace Trashbin
         {
             int maxAttempts = 100;     // số lần thử tối đa
             float checkRadius = 0.3f; // bán kính kiểm tra
-            string[] blockedTags = { "Wall", "Obstacle", "Tilemap" }; // danh sách tag cấm
+            string[] blockedTags = { "Wall","Tilemap" }; // danh sách tag cấm
 
             for (int attempt = 0; attempt < maxAttempts; attempt++)
             {

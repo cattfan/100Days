@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eae67d30d82dac74185c9d1e234d0f63, type: 3}
-  m_Name: "Chai nh\u1EF1a 6"
+  m_Name: "H\u1ED9p gi\u1EA5y 1"
   m_EditorClassIdentifier: 
-  itemName: "Chai n\u01B0\u1EDBc ng\u1ECDt"
+  itemName: "H\u1ED9p gi\u1EA5y"
   description: Item description
-  itemIcon: {fileID: 2269047082188048265, guid: f6ce26b80373cf2498c0918d68313bd3, type: 3}
-  itemID: 5
+  itemIcon: {fileID: -2476258253311705711, guid: f6ce26b80373cf2498c0918d68313bd3, type: 3}
+  itemID: 0
   rarity: 0
   dropRate: 50
   minDropAmount: 1
