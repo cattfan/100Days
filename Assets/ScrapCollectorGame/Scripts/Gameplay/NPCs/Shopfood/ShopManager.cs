@@ -2,33 +2,31 @@
 
 public class ShopManager : MonoBehaviour
 {
-    private CurrencyManager currencyManager;
-    private InventoryManager inventoryController;
+    private Inventory inventoryController;
+    private SaveController saveController; // Add this field to fix CS0103
 
     private void Awake()
     {
-        currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
-        inventoryController = Object.FindFirstObjectByType<InventoryManager>();
+        saveController = Object.FindFirstObjectByType<SaveController>();
+        inventoryController = Object.FindFirstObjectByType<Inventory>();
 
-        if (currencyManager == null)
-            Debug.LogError("ShopManager: Không tìm thấy CurrencyManager trong scene!");
         if (inventoryController == null)
             Debug.LogError("ShopManager: Không tìm thấy InventoryController trong scene!");
     }
 
     public void BuyItem(ShopItem shopItem)
     {
-        if (currencyManager == null || inventoryController == null || shopItem == null)
+        if (inventoryController == null || shopItem == null)
             return;
 
-        if (currencyManager.GetCoins() >= shopItem.itemCost)
+        if (saveController.currencyManager.GetCoins() >= shopItem.itemCost)
         {
             // Kiểm tra xem dữ liệu ItemData có tồn tại không
             if (shopItem.itemData != null)
             {
-                currencyManager.SpendCoins(shopItem.itemCost);
+
                 inventoryController.AddItem(shopItem.itemData, 1);
-                Debug.Log("Mua " + shopItem.itemName + " thành công!");
+                ItemPickupUIController.Instance?.ShowItemPickup(shopItem.itemName, shopItem.itemData.itemIcon);
             }
             else
             {
@@ -37,7 +35,7 @@ public class ShopManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Không đủ tiền để mua " + shopItem.itemName);
+            ItemPickupUIController.Instance?.ShowWarningPopup("Không đủ tiền để mua vật phẩm này!");
         }
     }
 }

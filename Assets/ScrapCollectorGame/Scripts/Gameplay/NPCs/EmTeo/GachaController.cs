@@ -226,14 +226,15 @@ namespace NumberInputSystem
             }
 
             ShowRewardMessage();
-            var currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
-            if (currencyManager != null)
+            SaveController saveController = FindFirstObjectByType<SaveController>();
+            if (saveController != null && saveController.currencyManager != null)
             {
-                currencyManager.AddCoins(tier.coinReward); // Mỗi lần mở tốn 5 coins
+                saveController.currencyManager.AddCoins(tier.coinReward);
+                Debug.Log($"Added {tier.coinReward} coins via SaveController's CurrencyManager");
             }
             else
             {
-                Debug.LogWarning("CurrencyManager not found in the scene.");
+                Debug.LogError("Could not find SaveController or its CurrencyManager!");
             }
         }
 

@@ -17,7 +17,7 @@ public class ShopNPC : MonoBehaviour, IInteractable
 
     // Add these lines to handle player detection directly in this script
     private GameObject playerObject;
-    private InventoryManager playerInventory;
+    private Inventory playerInventory;
     private CurrencyManager playerCurrency;
 
 
@@ -33,14 +33,11 @@ public class ShopNPC : MonoBehaviour, IInteractable
         GameObject gameController = GameObject.Find("GameController");
         if (gameController != null)
         {
-            playerInventory = gameController.GetComponent<InventoryManager>();
-            playerCurrency = gameController.GetComponent<CurrencyManager>();
+            playerInventory = gameController.GetComponent<Inventory>();
         }
 
         if (playerInventory == null)
             Debug.LogWarning("ShopNPC: Could not find InventoryController!");
-        if (playerCurrency == null)
-            Debug.LogWarning("ShopNPC: Could not find CurrencyManager!");
     }
 
     public void Interact()
@@ -61,7 +58,7 @@ public class ShopNPC : MonoBehaviour, IInteractable
         if (shopUI != null && shopUIManager != null)
         {
             shopUI.SetActive(true);
-            shopUIManager.OpenShop(playerInventory, playerCurrency);
+            shopUIManager.OpenShop(playerInventory);
         }
         else
         {

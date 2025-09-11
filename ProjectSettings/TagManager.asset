@@ -8,6 +8,8 @@ TagManager:
   - Object
   - Audio
   - NPC
+  - Wall
+  - Tilemap
   layers:
   - Default
   - TransparentFX

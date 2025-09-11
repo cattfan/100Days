@@ -27,7 +27,7 @@ public class CurrencyManager : MonoBehaviour
         UpdateCoinText();
     }
 
-    void Start()
+    void Awake()
     {
         UpdateCoinText();
     }

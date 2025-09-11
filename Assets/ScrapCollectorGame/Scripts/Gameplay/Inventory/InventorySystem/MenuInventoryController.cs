@@ -49,6 +49,7 @@ public class MenuInventoryController : MonoBehaviour
         {
             audioManagement.PlaySFX(audioManagement.OpenMenu);
         }
+
     }
 
     public void CloseInventory()
