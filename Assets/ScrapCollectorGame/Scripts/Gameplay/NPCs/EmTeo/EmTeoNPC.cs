@@ -57,10 +57,10 @@ public class GachaNPC : MonoBehaviour, IInteractable
 
     public void OpenEnterNumberUI()
     {
-        var currencyManager = Object.FindFirstObjectByType<CurrencyManager>();
-        if (currencyManager != null)
+        SaveController saveController = FindFirstObjectByType<SaveController>();
+        if (saveController != null && saveController.currencyManager != null)
         {
-            int coint = currencyManager.GetCoins();
+            int coint = saveController.currencyManager.GetCoins();
             if (coint < 100)
             {
                 ItemPickupUIController.Instance.ShowWarningPopup("Bạn cần ít nhất 100 xu để quay Gacha!");
@@ -68,10 +68,14 @@ public class GachaNPC : MonoBehaviour, IInteractable
                 playerInput.enabled = true;
                 return;
             }
+            else
+            {
+                saveController.currencyManager.SpendCoins(100);
+            }
         }
         else
         {
-            Debug.LogWarning("CurrencyManager not found in the scene.");
+            Debug.LogError("Could not find SaveController or its CurrencyManager!");
         }
         if (EnterNumberUI != null)
             DialogUi.SetActive(false);

@@ -75,6 +75,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemIcon: {fileID: 6845863219495011611}
   amountText: {fileID: 6731754929626992373}
+  Raritybackground: {fileID: 0}
 --- !u!114 &163574288667133111
 MonoBehaviour:
   m_ObjectHideFlags: 0
