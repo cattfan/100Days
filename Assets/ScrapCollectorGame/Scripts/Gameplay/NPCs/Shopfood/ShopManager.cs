@@ -50,18 +50,21 @@ public class ShopManager : MonoBehaviour
         {
             if (shopItem.itemData != null)
             {
-                // Trừ tiền của người chơi
-                saveController.currencyManager.AddCoins(-shopItem.itemCost);
-
-                // Thêm vật phẩm vào kho đồ
-                inventoryController.AddItem(shopItem.itemData, 1);
-
-                // Hiển thị thông báo đã mua
-                ItemPickupUIController.Instance?.ShowItemPickup(shopItem.itemName, shopItem.itemData.itemIcon);
-            }
-            else
-            {
-                Debug.LogError("Lỗi: Dữ liệu ItemData của vật phẩm " + shopItem.itemName + " bị thiếu.");
+                // Thử thêm vật phẩm vào kho đồ
+                bool added = inventoryController.AddItem(shopItem.itemData, 1);
+                if (added)
+                {
+                    // 🟢 Nếu add thành công thì trừ tiền và hiển thị thông báo
+                    saveController.currencyManager.AddCoins(-shopItem.itemCost);
+                    ItemPickupUIController.Instance?.ShowItemPickup(shopItem.itemName, shopItem.itemData.itemIcon);
+                    Debug.Log($"✅ Successfully bought {shopItem.itemName}!");
+                }
+                else
+                {
+                    // ❌ Nếu add thất bại (túi đồ đầy)
+                    Debug.Log("❌ Failed to buy item - inventory full!");
+                    // Không trừ tiền
+                }
             }
         }
         else
