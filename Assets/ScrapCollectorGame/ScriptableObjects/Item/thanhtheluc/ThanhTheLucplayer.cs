@@ -8,6 +8,10 @@ public class ThanhTheLucplayer : MonoBehaviour
     private float targetTheLuc;      // mục tiêu cần giảm về
     public float giamToc = 50f;      // tốc độ giảm (điều chỉnh cho mượt)
 
+    // 🌟 Thêm biến hồi chiêu
+    private float lastEatTime = -Mathf.Infinity;
+    public float eatCooldown = 5f;   // 5 giây giữa hai lần ăn
+
     void Start()
     {
         luongtheluchientai = luongtheluctoida;
@@ -19,107 +23,102 @@ public class ThanhTheLucplayer : MonoBehaviour
     {
         if (luongtheluchientai != targetTheLuc)
         {
-            // di chuyển dần về giá trị target
             luongtheluchientai = Mathf.MoveTowards(luongtheluchientai, targetTheLuc, giamToc * Time.deltaTime);
-            // cập nhật UI
             thanhtheluc.capnhatThanhTheLuc(luongtheluchientai, luongtheluctoida);
         }
     }
 
-    // Method gốc để trừ thể lực
+    /// <summary>
+    /// Thử ăn đồ để hồi thể lực, trả về true nếu thành công.
+    /// Kiểm tra đầy thể lực và hồi chiêu 5 giây.
+    /// </summary>
+    public bool TryEat(float restoreAmount)
+    {
+        // Kiểm tra hồi chiêu
+        if (Time.time - lastEatTime < eatCooldown)
+        {
+            ItemPickupUIController.Instance?.ShowWarningPopup("Bạn cần chờ thêm trước khi ăn tiếp!", 2f);
+            return false;
+        }
+
+        // Kiểm tra đầy thể lực
+        if (luongtheluchientai >= luongtheluctoida - 0.01f)
+        {
+            ItemPickupUIController.Instance?.ShowWarningPopup("Thể lực đã đầy, không thể ăn thêm!", 2f);
+            return false;
+        }
+
+        // Hồi thể lực
+        AddEnergy(restoreAmount);
+        lastEatTime = Time.time;
+        return true;
+    }
+
+    // ================== Các hàm cũ giữ nguyên ===================
+
     public void TruTheLuc(float amount)
     {
         targetTheLuc -= amount;
-        if (targetTheLuc < 0)
-            targetTheLuc = 0;
-        if (targetTheLuc <= 0)
-        {
-            Debug.Log("Bạn đã quá mệt rồi!");
-        }
+        if (targetTheLuc < 0) targetTheLuc = 0;
+        if (targetTheLuc <= 0) Debug.Log("Bạn đã quá mệt rồi!");
     }
 
-    // ✅ Methods mới cho save/load system - NĂNG LƯỢNG
-
-    // Method để set năng lượng trực tiếp (cho load game)
     public void SetEnergy(float newEnergy)
     {
         newEnergy = Mathf.Clamp(newEnergy, 0, luongtheluctoida);
         luongtheluchientai = newEnergy;
         targetTheLuc = newEnergy;
 
-        // Cập nhật UI ngay lập tức
         if (thanhtheluc != null)
-        {
             thanhtheluc.capnhatThanhTheLuc(luongtheluchientai, luongtheluctoida);
-        }
-
-        Debug.Log($"Energy set to: {luongtheluchientai}/{luongtheluctoida}");
     }
 
-    // Method để hồi năng lượng
     public void AddEnergy(float restoreAmount)
     {
         targetTheLuc += restoreAmount;
         if (targetTheLuc > luongtheluctoida)
             targetTheLuc = luongtheluctoida;
-
-        Debug.Log($"Restoring {restoreAmount} energy. Target energy: {targetTheLuc}");
     }
 
-    // Method để set năng lượng tối đa mới
     public void SetMaxEnergy(float newMaxEnergy)
     {
         float energyPercentage = luongtheluchientai / luongtheluctoida;
         luongtheluctoida = newMaxEnergy;
-
-        // Giữ % năng lượng hiện tại
         luongtheluchientai = luongtheluctoida * energyPercentage;
         targetTheLuc = luongtheluchientai;
 
         if (thanhtheluc != null)
-        {
             thanhtheluc.capnhatThanhTheLuc(luongtheluchientai, luongtheluctoida);
-        }
     }
 
-    // Method để lấy % năng lượng hiện tại
     public float GetEnergyPercentage()
     {
         return luongtheluctoida > 0 ? luongtheluchientai / luongtheluctoida : 0f;
     }
 
-    // Method để kiểm tra player có hết năng lượng không
     public bool IsExhausted()
     {
         return luongtheluchientai <= 0;
     }
 
-    // Method để hồi năng lượng ngay lập tức (không có animation)
     public void InstantRestoreEnergy(float restoreAmount)
     {
         luongtheluchientai = Mathf.Min(luongtheluchientai + restoreAmount, luongtheluctoida);
         targetTheLuc = luongtheluchientai;
 
         if (thanhtheluc != null)
-        {
             thanhtheluc.capnhatThanhTheLuc(luongtheluchientai, luongtheluctoida);
-        }
     }
 
-    // Method để tiêu hao năng lượng ngay lập tức (không có animation)
     public void InstantUseEnergy(float amount)
     {
         luongtheluchientai = Mathf.Max(luongtheluchientai - amount, 0);
         targetTheLuc = luongtheluchientai;
 
         if (thanhtheluc != null)
-        {
             thanhtheluc.capnhatThanhTheLuc(luongtheluchientai, luongtheluctoida);
-        }
 
         if (luongtheluchientai <= 0)
-        {
             Debug.Log("Bạn đã quá mệt rồi!");
-        }
     }
 }

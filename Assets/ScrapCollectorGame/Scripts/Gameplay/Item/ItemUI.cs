@@ -5,25 +5,15 @@ using TMPro;
 
 public class ItemUI : MonoBehaviour, IPointerClickHandler
 {
-    // Cần khai báo các biến này ở đây để chúng có thể được truy cập bởi tất cả các phương thức.
     private ItemData itemData;
     private int amount;
 
-    // Sử dụng [SerializeField] để gán trong Unity Inspector.
     [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI amountText;
 
-    // Getter để các script khác có thể truy cập ItemData
-    public ItemData GetItemData()
-    {
-        return itemData;
-    }
+    public ItemData GetItemData() => itemData;
 
-    // Getter cho biến amount
-    public int Amount
-    {
-        get { return amount; }
-    }
+    public int Amount => amount;
 
     public void Setup(ItemData data, int count)
     {
@@ -42,33 +32,22 @@ public class ItemUI : MonoBehaviour, IPointerClickHandler
     public void AddAmount(int value)
     {
         amount += value;
-        if (amount < 0)
-        {
-            amount = 0;
-        }
-
+        if (amount < 0) amount = 0;
         UpdateAmountText();
 
-        if (amount == 0)
-        {
-            Destroy(gameObject);
-        }
+        if (amount == 0) Destroy(gameObject);
     }
 
     private void UpdateAmountText()
     {
         if (amountText != null)
-        {
             amountText.text = amount > 1 ? amount.ToString() : "";
-        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
-        {
             UseItem();
-        }
     }
 
     private void UseItem()
@@ -81,15 +60,18 @@ public class ItemUI : MonoBehaviour, IPointerClickHandler
 
         if (itemData.isFood)
         {
-            // Fix lỗi bằng cách sử dụng FindAnyObjectByType
+            // ✅ Sử dụng TryEat để kiểm tra hồi chiêu & đầy thể lực
             ThanhTheLucplayer playerStamina = FindAnyObjectByType<ThanhTheLucplayer>();
 
             if (playerStamina != null)
             {
-                playerStamina.AddEnergy(itemData.staminaRestoreAmount);
-                Debug.Log($"Đã dùng {itemData.itemName}. Hồi {itemData.staminaRestoreAmount} thể lực.");
-
-                AddAmount(-1);
+                bool eaten = playerStamina.TryEat(itemData.staminaRestoreAmount);
+                if (eaten)
+                {
+                    Debug.Log($"Đã dùng {itemData.itemName}. Hồi {itemData.staminaRestoreAmount} thể lực.");
+                    AddAmount(-1);
+                }
+                // Nếu không ăn được, TryEat đã hiển thị popup cảnh báo.
             }
             else
             {
