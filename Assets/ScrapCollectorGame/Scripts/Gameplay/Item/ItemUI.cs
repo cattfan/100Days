@@ -33,7 +33,7 @@ public class ItemUI : MonoBehaviour, IPointerClickHandler
         if (itemIcon != null && data.itemIcon != null)
         {
             itemIcon.sprite = data.itemIcon;
-            itemIcon.color = data.GetRarityColor();
+            itemIcon.color = Color.white;
         }
 
         UpdateAmountText();
