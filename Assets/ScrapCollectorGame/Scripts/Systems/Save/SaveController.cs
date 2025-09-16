@@ -65,8 +65,6 @@ public class SaveController : MonoBehaviour
         }
     }
 
-
-
     // Làm sạch tên file, loại bỏ ký tự không hợp lệ
     private string SanitizeFileName(string fileName)
     {
@@ -104,13 +102,17 @@ public class SaveController : MonoBehaviour
         // Lấy dữ liệu inventory từ InventoryPersistence
         List<InventoryItemData> inventoryData = inventoryPersistence.GetInventoryData();
 
+        // Lấy dữ liệu xe từ tất cả CarInteraction trong scene
+        List<CarData> carData = GetAllCarData();
+
         SaveData data = new SaveData(
             playerName: playerName,
             playerPosition: player.position,
             playerRotation: player.rotation,
             playerEnergy: playerEnergyManager.luongtheluchientai,
             playerCurrency: currencyManager.GetCoins(),
-            inventoryItems: inventoryData
+            inventoryItems: inventoryData,
+            carData: carData
         );
 
         string json = JsonUtility.ToJson(data, true);
@@ -119,7 +121,7 @@ public class SaveController : MonoBehaviour
         {
             File.WriteAllText(customPath, json);
             Debug.Log($"Game saved successfully for {playerName} at: " + customPath);
-            Debug.Log($"Saved - Player: {playerName}, Health: {playerEnergyManager.luongtheluchientai}/{playerEnergyManager.luongtheluctoida}, Currency: {currencyManager.GetCoins()}, Items: {inventoryData.Count}");
+            Debug.Log($"Saved - Player: {playerName}, Health: {playerEnergyManager.luongtheluchientai}/{playerEnergyManager.luongtheluctoida}, Currency: {currencyManager.GetCoins()}, Items: {inventoryData.Count}, Cars: {carData.Count}");
         }
         catch (System.Exception e)
         {
@@ -155,7 +157,7 @@ public class SaveController : MonoBehaviour
                 ApplyLoadedData(data);
 
                 Debug.Log($"Game loaded successfully for {playerName}");
-                Debug.Log($"Loaded - Player: {data.playerName}, Health: {data.playerEnergy}, Currency: {data.playerCurrency}, Items: {data.inventoryItems?.Count ?? 0}");
+                Debug.Log($"Loaded - Player: {data.playerName}, Health: {data.playerEnergy}, Currency: {data.playerCurrency}, Items: {data.inventoryItems?.Count ?? 0}, Cars: {data.carData?.Count ?? 0}");
             }
             catch (System.Exception e)
             {
@@ -200,8 +202,56 @@ public class SaveController : MonoBehaviour
         inventoryPersistence.LoadInventoryData(data.inventoryItems);
         Debug.Log("Inventory slots after load: " + inventoryPersistence.GetSlots().Count(s => s.currentItem != null));
 
+        // Car data - Load car ownership and positions
+        Debug.Log($"Loading car data with {data.carData?.Count ?? 0} cars");
+        LoadAllCarData(data.carData);
 
-        Debug.Log($"Applied loaded data - Player: {data.playerName}, Health: {data.playerEnergy}/{playerEnergyManager.luongtheluctoida}, Currency: {data.playerCurrency}, Items: {data.inventoryItems?.Count ?? 0}");
+        Debug.Log($"Applied loaded data - Player: {data.playerName}, Health: {data.playerEnergy}/{playerEnergyManager.luongtheluctoida}, Currency: {data.playerCurrency}, Items: {data.inventoryItems?.Count ?? 0}, Cars: {data.carData?.Count ?? 0}");
+    }
+
+    private List<CarData> GetAllCarData()
+    {
+        List<CarData> carDataList = new List<CarData>();
+        CarInteraction[] allCars = FindObjectsOfType<CarInteraction>();
+
+        foreach (CarInteraction car in allCars)
+        {
+            carDataList.Add(car.GetCarData());
+        }
+
+        Debug.Log($"Found {carDataList.Count} cars to save");
+        return carDataList;
+    }
+
+    private void LoadAllCarData(List<CarData> carDataList)
+    {
+        if (carDataList == null || carDataList.Count == 0)
+        {
+            Debug.Log("No car data to load");
+            return;
+        }
+
+        CarInteraction[] allCars = FindObjectsOfType<CarInteraction>();
+        DuyBanXeNPC[] allCarNPCs = FindObjectsOfType<DuyBanXeNPC>();
+
+        foreach (CarData carData in carDataList)
+        {
+            // Load car state
+            CarInteraction targetCar = System.Array.Find(allCars, car => car.GetCarId() == carData.carId);
+            if (targetCar != null)
+            {
+                targetCar.LoadCarData(carData);
+            }
+
+            // Update corresponding car dealer NPC state
+            DuyBanXeNPC correspondingNPC = System.Array.Find(allCarNPCs, npc => npc.GetCarId() == carData.carId);
+            if (correspondingNPC != null && carData.isUnlocked)
+            {
+                correspondingNPC.SetCarAsPurchased();
+            }
+        }
+
+        Debug.Log($"Loaded {carDataList.Count} car states");
     }
 
     private void ResetCurrency()
@@ -243,7 +293,6 @@ public class SaveController : MonoBehaviour
 
         return saveFiles;
     }
-
 
     public List<(string playerName, int coins)> GetAllSaveSummaries()
     {

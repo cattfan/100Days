@@ -23,14 +23,54 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
     [Header("Chi phí")]
     [SerializeField] private int giaXe = 100;
 
-    private CurrencyManager currencyManager;
+    private SaveController saveCtrl; // 👉 thay vì giữ CurrencyManager riêng
     private bool isPlayerInside = false;
     private bool panelOpened = false;
     private bool isSelected = false;
+    private bool isCarPurchased = false; // Track if car is already purchased
+
+    public string GetCarId()
+    {
+        if (car != null)
+        {
+            var carInteraction = car.GetComponent<CarInteraction>();
+            if (carInteraction != null)
+            {
+                return carInteraction.GetCarId();
+            }
+        }
+        return gameObject.name + "_car";
+    }
+
+    public void SetCarAsPurchased()
+    {
+        isCarPurchased = true;
+        
+        // Update UI to reflect purchased state
+        if (btnMua != null)
+        {
+            btnMua.interactable = false;
+            Text muaText = btnMua.GetComponentInChildren<Text>();
+            if (muaText != null) muaText.text = "Đã mua";
+        }
+        
+        if (btnChonXe != null)
+        {
+            btnChonXe.interactable = false;
+        }
+
+        isSelected = false;
+        if (hoverChonXe != null)
+        {
+            hoverChonXe.SetActive(false);
+        }
+
+        Debug.Log($"Car {GetCarId()} set as purchased");
+    }
 
     private void Start()
     {
-        currencyManager = FindObjectOfType<CurrencyManager>();
+        saveCtrl = FindObjectOfType<SaveController>();
 
         btnChonXe.onClick.AddListener(ToggleSelect);
         btnMua.onClick.AddListener(TryBuy);
@@ -43,6 +83,21 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
         hoverChonXe.SetActive(false);
         messCanhBao.SetActive(false);
         messXacNhan.SetActive(false);
+
+        // Check if car is already purchased on start
+        CheckCarPurchaseState();
+    }
+
+    private void CheckCarPurchaseState()
+    {
+        if (car != null)
+        {
+            var carInteraction = car.GetComponent<CarInteraction>();
+            if (carInteraction != null && carInteraction.IsUnlocked())
+            {
+                SetCarAsPurchased();
+            }
+        }
     }
 
     private void Update()
@@ -68,15 +123,17 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
 
     private void ToggleSelect()
     {
+        if (isCarPurchased) return; // Don't allow selection if already purchased
+        
         isSelected = !isSelected;
         hoverChonXe.SetActive(isSelected);
     }
 
     private void TryBuy()
     {
-        if (!isSelected) return;
+        if (!isSelected || saveCtrl == null || isCarPurchased) return;
 
-        if (currencyManager.GetCoins() < giaXe)
+        if (saveCtrl.currencyManager.GetCoins() < giaXe)
         {
             messCanhBao.SetActive(true);
         }
@@ -88,7 +145,7 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
 
     private void OnConfirmBuy()
     {
-        if (currencyManager.SpendCoins(giaXe))
+        if (saveCtrl != null && saveCtrl.currencyManager.SpendCoins(giaXe))
         {
             Debug.Log("Mua thành công xe!");
             messXacNhan.SetActive(false);
@@ -100,15 +157,11 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
                 if (carInt != null) carInt.UnlockCar();
             }
 
-            // Reset UI
-            isSelected = false;
-            hoverChonXe.SetActive(false);
-            btnMua.interactable = false;
-            btnChonXe.interactable = false;
+            // Set car as purchased
+            SetCarAsPurchased();
 
-            // Đổi text nút Mua thành "Đã mua"
-            Text muaText = btnMua.GetComponentInChildren<Text>();
-            if (muaText != null) muaText.text = "Đã mua";
+            // 🔑 Gọi Save ngay lập tức để lưu trạng thái mua xe
+            saveCtrl.SaveGame();
         }
     }
 
@@ -147,6 +200,7 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
     }
 
     public bool CanInteract() => true;
+
     public void Interact()
     {
         Debug.Log("Interacted with DuyBanXe: " + gameObject.name);
