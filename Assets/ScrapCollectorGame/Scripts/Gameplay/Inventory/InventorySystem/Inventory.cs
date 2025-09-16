@@ -39,6 +39,7 @@ public partial class Inventory
         if (emptySlot == null)
         {
             Debug.LogWarning("Inventory full!");
+            ItemPickupUIController.Instance?.ShowWarningPopup("Túi đồ đầy không thể thêm");
             return false;
         }
 
