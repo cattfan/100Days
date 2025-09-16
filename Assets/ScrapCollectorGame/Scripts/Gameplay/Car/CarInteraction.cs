@@ -4,6 +4,9 @@ using Unity.Cinemachine; // Cinemachine 3.x
 
 public class CarInteraction : MonoBehaviour
 {
+    [Header("Car ID")]
+    [SerializeField] private string carId; // Unique identifier for this car
+
     [Header("UI")]
     [SerializeField] private GameObject messageUI;       // "Bấm E để sử dụng phương tiện"
     [SerializeField] private GameObject lockedMessageUI; // "Xe đang khóa"
@@ -34,14 +37,46 @@ public class CarInteraction : MonoBehaviour
     private bool isPlayerNear, isInCar, isBusy;
     private bool isUnlocked = false; // 🚧 mặc định khoá
 
+    // Methods for save/load system
+    public string GetCarId() => carId;
+    public bool IsUnlocked() => isUnlocked;
+
     public void UnlockCar()
     {
         isUnlocked = true;
         Debug.Log("[CarInteraction] Xe đã được mở khóa!");
     }
 
+    public void SetUnlocked(bool unlocked)
+    {
+        isUnlocked = unlocked;
+        Debug.Log($"[CarInteraction] Car {carId} unlock state set to: {unlocked}");
+    }
+
+    public CarData GetCarData()
+    {
+        return new CarData(carId, isUnlocked, transform.position, transform.rotation);
+    }
+
+    public void LoadCarData(CarData data)
+    {
+        if (data != null && data.carId == carId)
+        {
+            isUnlocked = data.isUnlocked;
+            transform.position = data.carPosition;
+            transform.rotation = data.carRotation;
+            Debug.Log($"[CarInteraction] Loaded car data for {carId}: unlocked={isUnlocked}");
+        }
+    }
+
     private void Awake()
     {
+        // Generate unique ID if not set
+        if (string.IsNullOrEmpty(carId))
+        {
+            carId = gameObject.name + "_" + transform.position.ToString();
+        }
+
         player = GameObject.FindWithTag("Player");
         if (!player) { Debug.LogError("[CarInteraction] Không thấy Player (tag=Player)"); return; }
 

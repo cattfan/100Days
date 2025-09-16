@@ -35,9 +35,9 @@ public class CurrencyManager : MonoBehaviour
     void Update()
     {
         // Test tăng tiền khi nhấn phím T
-        if (Keyboard.current.tKey.wasPressedThisFrame)
+        if (Keyboard.current.uKey.wasPressedThisFrame)
         {
-            AddCoins(1000000000); // tăng 10 coins
+            AddCoins(100000); // tăng 10 coins
             Debug.Log("Đã thêm 10 coins");
         }
         // Test giảm tiền khi nhấn phím G
