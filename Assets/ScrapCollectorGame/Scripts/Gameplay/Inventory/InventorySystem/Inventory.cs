@@ -15,51 +15,65 @@ public partial class Inventory
             return false;
         }
 
-        Debug.Log("AddItem: Attempting to add item " + data.name);
+        int remaining = amount;
 
         if (data.isStackable)
         {
+            // 1️⃣ Tìm các stack hiện có và cộng thêm nhưng không vượt maxStackSize
             foreach (var s in slots)
             {
-                if (s.currentItem != null)
+                if (s.currentItem == null) continue;
+
+                var ui = s.currentItem.GetComponent<ItemUI>();
+                if (ui != null && ui.GetItemData() == data)
                 {
-                    var ui = s.currentItem.GetComponent<ItemUI>();
-                    if (ui != null && ui.GetItemData() == data)
+                    int canAdd = Mathf.Min(remaining, data.maxStackSize - ui.Amount);
+                    if (canAdd > 0)
                     {
-                        ui.AddAmount(amount);
-                        Debug.Log("AddItem: Added to existing stack.");
-                        return true;
+                        ui.AddAmount(canAdd);
+                        remaining -= canAdd;
                     }
+
+                    if (remaining <= 0) return true; // đã thêm hết
                 }
             }
         }
 
-        var emptySlot = slots.FirstOrDefault(s => s.currentItem == null);
-
-        if (emptySlot == null)
+        // 2️⃣ Nếu còn dư, tạo stack mới cho từng phần còn lại
+        while (remaining > 0)
         {
-            Debug.LogWarning("Inventory full!");
-            return false;
+            var emptySlot = slots.FirstOrDefault(s => s.currentItem == null);
+            if (emptySlot == null)
+            {
+                Debug.LogWarning("Inventory full!");
+                return false;
+            }
+
+            int addAmount = data.isStackable
+                ? Mathf.Min(remaining, data.maxStackSize)
+                : 1;
+
+            var itemGO = Instantiate(itemUIPrefab, emptySlot.transform);
+            var rt = itemGO.GetComponent<RectTransform>();
+            if (rt != null) { rt.anchoredPosition = Vector2.zero; rt.localScale = Vector3.one; }
+
+            var uiComp = itemGO.GetComponent<ItemUI>();
+            if (!uiComp)
+            {
+                Debug.LogError("itemUIPrefab missing ItemUI!");
+                Destroy(itemGO);
+                return false;
+            }
+
+            uiComp.Setup(data, addAmount);
+            emptySlot.currentItem = itemGO;
+
+            remaining -= addAmount;
         }
 
-        if (itemUIPrefab == null)
-        {
-            Debug.LogError("AddItem: itemUIPrefab not assigned!");
-            return false;
-        }
-
-        var itemGO = Instantiate(itemUIPrefab, emptySlot.transform);
-        var rt = itemGO.GetComponent<RectTransform>();
-        if (rt != null) { rt.anchoredPosition = Vector2.zero; rt.localScale = Vector3.one; }
-
-        var uiComp = itemGO.GetComponent<ItemUI>();
-        if (!uiComp) { Debug.LogError("itemUIPrefab missing ItemUI!"); return false; }
-
-        uiComp.Setup(data, amount);
-        emptySlot.currentItem = itemGO;
-        Debug.Log("AddItem: Added new item to empty slot.");
         return true;
     }
+
 
     public void RemoveItem(ItemData data, int amount)
     {

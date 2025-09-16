@@ -17,7 +17,7 @@ MonoBehaviour:
   itemIcon: {fileID: -9213056636207805707, guid: 17147171d53794443adec46db735f571, type: 3}
   itemID: 16
   isFood: 1
-  staminaRestoreAmount: 30
+  staminaRestoreAmount: 20
   rarity: 0
   dropRate: 50
   minDropAmount: 1

@@ -17,4 +17,4 @@ MonoBehaviour:
   itemCost: 25
   itemData: {fileID: 11400000, guid: 41da637f1d6534b438cee4d2bf76ad8a, type: 2}
   canBeConsumed: 1
-  staminaRestoreAmount: 30
+  staminaRestoreAmount: 20
