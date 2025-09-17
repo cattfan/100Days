@@ -506,18 +506,7 @@
                 {
                     "name": "",
                     "id": "23888440-a065-4cd3-bc22-370ecfee0024",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Talk/InteractNPC",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6defc28a-d45d-4dff-99b9-c7b581f35abd",
-                    "path": "<Keyboard>/t",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

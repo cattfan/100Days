@@ -100,14 +100,6 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
         }
     }
 
-    private void Update()
-    {
-        if (isPlayerInside && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            TogglePanel();
-        }
-    }
-
     private void TogglePanel()
     {
         panelOpened = !panelOpened;
@@ -199,11 +191,16 @@ public class DuyBanXeNPC : MonoBehaviour, IInteractable
         }
     }
 
-    public bool CanInteract() => true;
+    public bool CanInteract() => isPlayerInside && !isCarPurchased;
 
+    // Implement Interact method để sử dụng với NPCDetector và phím E
     public void Interact()
     {
-        Debug.Log("Interacted with DuyBanXe: " + gameObject.name);
+        if (isPlayerInside)
+        {
+            TogglePanel();
+            Debug.Log("Interacted with DuyBanXe: " + gameObject.name + " using E key");
+        }
     }
 
     private void Reset()
