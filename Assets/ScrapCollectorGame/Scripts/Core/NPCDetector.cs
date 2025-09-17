@@ -18,12 +18,23 @@ public class NPCDetector : MonoBehaviour
             talkIcon.SetActive(false);
     }
 
+    // Method cho action "Talk" - chỉ sử dụng phím E
     public void OnTalk(InputAction.CallbackContext context)
     {
         if (context.performed && currentNPC != null && currentNPC.CanInteract())
         {
             currentNPC.Interact();
             Debug.Log("Talked to NPC: " + ((MonoBehaviour)currentNPC).gameObject.name);
+        }
+    }
+
+    // Method cho action "Interact" - cũng chỉ sử dụng phím E để đảm bảo tương thích
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.performed && currentNPC != null && currentNPC.CanInteract())
+        {
+            currentNPC.Interact();
+            Debug.Log("Interacted with NPC: " + ((MonoBehaviour)currentNPC).gameObject.name);
         }
     }
 
@@ -35,7 +46,7 @@ public class NPCDetector : MonoBehaviour
         {
             currentNPC = interactable;
 
-            // Hiện talk icon
+            // Hiện talk icon với text "Bấm E để tương tác"
             if (talkIcon != null)
                 talkIcon.SetActive(true);
 
@@ -46,7 +57,7 @@ public class NPCDetector : MonoBehaviour
                 nameComponent.ShowName();
             }
 
-            Debug.Log("Entered NPC range: " + other.gameObject.name);
+            Debug.Log("Entered NPC range: " + other.gameObject.name + " - Press E to interact");
         }
     }
 
