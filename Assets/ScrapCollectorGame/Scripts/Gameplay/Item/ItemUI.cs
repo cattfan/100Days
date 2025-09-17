@@ -46,6 +46,12 @@ public class ItemUI : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+       if (gameObject.CompareTag("ShopItem"))
+        {
+            // Trong shop, không cho phép ăn item bằng right-click
+            return;
+        }
+
         if (eventData.button == PointerEventData.InputButton.Right)
             UseItem();
     }
