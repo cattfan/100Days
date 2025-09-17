@@ -21,7 +21,6 @@ public class ShopUIManager : MonoBehaviour
     [Header("Audio")]
     public AudioManagement audioManagement;
 
-    // Đổi sang InventoryManager
     private Inventory playerInventory;
 
     private ItemData currentItemToSell;
@@ -64,7 +63,6 @@ public class ShopUIManager : MonoBehaviour
         playerInput = FindFirstObjectByType<PlayerInput>();
     }
 
-    // Gọi từ ShopNPC
     public void OpenShop(Inventory inventory)
     {
         this.playerInventory = inventory;
@@ -95,9 +93,6 @@ public class ShopUIManager : MonoBehaviour
         audioManagement.PlaySFX(audioManagement.CloseMenu);
     }
 
-    /// <summary>
-    /// Clone inventory thật sang shop panel
-    /// </summary>
     private void CloneInventory()
     {
         foreach (Transform c in shopInventoryPanel)
@@ -118,16 +113,13 @@ public class ShopUIManager : MonoBehaviour
                     var itemClone = Instantiate(itemUIPrefab, slotClone.transform).GetComponent<ItemUI>();
                     itemClone.Setup(itemUI.GetItemData(), itemUI.Amount);
 
-                    // Loại bỏ ItemDragHandler
                     var dragHandler = itemClone.GetComponent<ItemDragHandler>();
                     if (dragHandler != null) Destroy(dragHandler);
 
-                    // ✅ VÔ HIỆU HÓA IPointerClickHandler (right-click để ăn)
                     var itemUIComponent = itemClone.GetComponent<ItemUI>();
                     if (itemUIComponent != null)
                     {
-                        // Thêm một flag để ItemUI biết là đang trong shop
-                        itemClone.gameObject.tag = "ShopItem"; // Hoặc dùng cách khác
+                        itemClone.gameObject.tag = "ShopItem";
                     }
 
                     slotClone.currentItem = itemClone.gameObject;
@@ -192,10 +184,8 @@ public class ShopUIManager : MonoBehaviour
         {
             Debug.LogError("Could not find SaveController or its CurrencyManager!");
         }
-        // Xóa item trong inventory thật
         playerInventory.RemoveItemAtSlot(currentPlayerSlotIndex);
 
-        // Xóa item trong clone UI
         if (currentPlayerSlotIndex >= 0 && currentPlayerSlotIndex < shopSlots.Count)
         {
             var slot = shopSlots[currentPlayerSlotIndex];
