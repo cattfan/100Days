@@ -5,25 +5,22 @@ using TMPro;
 public class CurrencyManager : MonoBehaviour
 {
     public TMP_Text coinText;
-    private int coins = 0; // Biến coins đã là private
+    private int coins = 0;
 
-    // Thêm hàm public để lấy giá trị của biến coins
     public int GetCoins()
     {
         return coins;
     }
 
-    // Thêm hàm để reset coins về 0 (cho LoadGame)
     public void ResetCoins()
     {
         coins = 0;
         UpdateCoinText();
     }
 
-    // Thêm hàm để set coins trực tiếp (alternative cho ResetCoins + AddCoins)
     public void SetCoins(int amount)
     {
-        coins = Mathf.Max(0, amount); // Đảm bảo không âm
+        coins = Mathf.Max(0, amount);
         UpdateCoinText();
     }
 
@@ -31,6 +28,16 @@ public class CurrencyManager : MonoBehaviour
     {
         UpdateCoinText();
     }
+
+    void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
+        {
+            AddCoins(1000);
+            Debug.Log("Đã thêm 1000 coins bằng phím T!");
+        }
+    }
+
     public void AddCoins(int amount)
     {
         coins += amount;
@@ -43,11 +50,11 @@ public class CurrencyManager : MonoBehaviour
         {
             coins -= amount;
             UpdateCoinText();
-            return true; // Thành công
+            return true;
         }
         else
         {
-            return false; // Không đủ tiền
+            return false;
         }
     }
 

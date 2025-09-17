@@ -5,19 +5,15 @@ public class ShopManager : MonoBehaviour
     private Inventory inventoryController;
     private SaveController saveController;
 
-    // Biến để chứa GameObject của giao diện shop
     public GameObject shopUI;
 
-    // Tham chiếu đến script NpcShopInteraction để có thể đóng shop từ đây.
     public NpcShopInteraction npcShopInteraction;
 
     private void Awake()
     {
-        // Tìm và gán các controller cần thiết
         saveController = Object.FindFirstObjectByType<SaveController>();
         inventoryController = Object.FindFirstObjectByType<Inventory>();
 
-        // Kiểm tra xem các controller đã được tìm thấy chưa để tránh lỗi null reference
         if (inventoryController == null)
         {
             Debug.LogError("ShopManager: Không tìm thấy InventoryController trong scene!");
@@ -28,7 +24,6 @@ public class ShopManager : MonoBehaviour
             Debug.LogError("ShopManager: Không tìm thấy SaveController trong scene!");
         }
 
-        // Lấy tham chiếu đến NpcShopInteraction
         npcShopInteraction = Object.FindFirstObjectByType<NpcShopInteraction>();
         if (npcShopInteraction == null)
         {
@@ -38,50 +33,41 @@ public class ShopManager : MonoBehaviour
 
     public void BuyItem(ShopItem shopItem)
     {
-        // Kiểm tra các tham chiếu để tránh lỗi
         if (inventoryController == null || saveController == null || shopItem == null)
         {
             Debug.LogError("ShopManager: Thiếu tham chiếu cần thiết để mua vật phẩm.");
             return;
         }
 
-        // Kiểm tra xem người chơi có đủ tiền không
         if (saveController.currencyManager.GetCoins() >= shopItem.itemCost)
         {
             if (shopItem.itemData != null)
             {
-                // Thử thêm vật phẩm vào kho đồ
                 bool added = inventoryController.AddItem(shopItem.itemData, 1);
                 if (added)
                 {
-                    // 🟢 Nếu add thành công thì trừ tiền và hiển thị thông báo
                     saveController.currencyManager.AddCoins(-shopItem.itemCost);
                     ItemPickupUIController.Instance?.ShowItemPickup(shopItem.itemName, shopItem.itemData.itemIcon);
                     Debug.Log($"✅ Successfully bought {shopItem.itemName}!");
                 }
                 else
                 {
-                    // ❌ Nếu add thất bại (túi đồ đầy)
                     Debug.Log("❌ Failed to buy item - inventory full!");
-                    // Không trừ tiền
                 }
             }
         }
         else
         {
-            // Hiển thị thông báo không đủ tiền
             ItemPickupUIController.Instance?.ShowWarningPopup("Không đủ tiền để mua vật phẩm này!");
         }
     }
 
-    // Phương thức đóng shop
     public void CloseShop()
     {
         if (shopUI != null)
         {
             shopUI.SetActive(false);
 
-            // Bổ sung: Gọi phương thức CloseShop() trong NpcShopInteraction để đặt lại trạng thái
             if (npcShopInteraction != null)
             {
                 npcShopInteraction.CloseShop();

@@ -7,27 +7,27 @@ using TMPro;
 public class LoadGameMenu : MonoBehaviour
 {
     public SaveController saveController;
-    public MenuManager menuManager; // Tham chiếu tới MenuManager
+    public MenuManager menuManager;
     public GameObject buttonPrefab;
     public Transform buttonContainer;
     public GameObject deleteConfirmationPanel;
-    public GameObject DeleteButton; // Nút để bật/tắt chế độ x
+    public GameObject DeleteButton;
 
     [Header("Delete Confirmation UI")]
-    public TMP_Text deleteConfirmationText; // 👉 Thêm TMP_Text để hiển thị nội dung xác nhận
-    public TMP_Text TMPTitle ; // Tiêu đề gốc của nút Delete
+    public TMP_Text deleteConfirmationText;
+    public TMP_Text TMPTitle;
 
     private bool isDeleteMode = false;
     private string playerNameToDelete;
-    private int coinsToDelete; // 👉 Lưu số coin để hiển thị cùng
-    private string Title = "Load Save Game"; // Lưu tiêu đề gốc của nút Delete
+    private int coinsToDelete;
+    private string Title = "Load Save Game";
 
     void OnEnable()
     {
         PopulateSaveButtons();
         isDeleteMode = false;
         deleteConfirmationPanel.SetActive(false);
-        TMPTitle.text = Title; // Khôi phục tiêu đề gốc khi mở menu
+        TMPTitle.text = Title;
 
     }
 
@@ -82,16 +82,14 @@ public class LoadGameMenu : MonoBehaviour
     public void ToggleDeleteMode()
     {
         isDeleteMode = !isDeleteMode;
-        TMPTitle.text = isDeleteMode ? "Delete Save Game" : Title; // Thay đổi tiêu đề nút
+        TMPTitle.text = isDeleteMode ? "Delete Save Game" : Title;
     }
 
-    // 👉 Cập nhật hàm để truyền thêm coins
     public void PromptDelete(string playerName, int coins)
     {
         playerNameToDelete = playerName;
         coinsToDelete = coins;
 
-        // Hiển thị thông báo xác nhận
         if (deleteConfirmationText != null)
         {
             deleteConfirmationText.text = $"Bạn có chắc muốn xóa save \"{playerNameToDelete} - {coinsToDelete} coins\" không?";

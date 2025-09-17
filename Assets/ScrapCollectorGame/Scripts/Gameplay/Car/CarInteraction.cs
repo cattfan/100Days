@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using Unity.Cinemachine; // Cinemachine 3.x
+using Unity.Cinemachine;
 
 public class CarInteraction : MonoBehaviour
 {
@@ -32,6 +32,7 @@ public class CarInteraction : MonoBehaviour
 
     private GameObject player;
     private PlayerInput playerInput;
+    private Animator playerAnimator;
     private InputAction interactAction;
     private SpriteRenderer[] playerRenderers;
     private bool isPlayerNear, isInCar, isBusy;
@@ -81,6 +82,7 @@ public class CarInteraction : MonoBehaviour
         if (!player) { Debug.LogError("[CarInteraction] Không thấy Player (tag=Player)"); return; }
 
         playerInput = player.GetComponent<PlayerInput>();
+        playerAnimator = player.GetComponent<Animator>();
         if (playerInput == null || playerInput.actions == null)
         { Debug.LogError("[CarInteraction] PlayerInput/actions NULL"); return; }
 
@@ -183,6 +185,15 @@ public class CarInteraction : MonoBehaviour
 
         if (seatPoint) player.transform.position = seatPoint.position;
 
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetFloat("MoveX", 0f);
+            playerAnimator.SetFloat("MoveY", 0f);
+            playerAnimator.SetFloat("Speed", 0f);
+            playerAnimator.SetBool("Move", false);
+            playerAnimator.enabled = false;
+        }
+
         SetPlayerVisible(false);
         if (messageUI) messageUI.SetActive(false);
 
@@ -223,6 +234,15 @@ public class CarInteraction : MonoBehaviour
 
         playerInput.SwitchCurrentActionMap(onFootMapName);
         RebindInteract();
+
+        if (playerAnimator != null)
+        {
+            playerAnimator.enabled = true;
+            playerAnimator.SetFloat("MoveX", 0f);
+            playerAnimator.SetFloat("MoveY", 0f);
+            playerAnimator.SetFloat("Speed", 0f);
+            playerAnimator.SetBool("Move", false);
+        }
 
         SetPlayerVisible(true);
 
