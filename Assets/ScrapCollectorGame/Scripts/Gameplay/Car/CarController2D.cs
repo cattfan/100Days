@@ -23,12 +23,15 @@ public class CarController2D : MonoBehaviour
     public float animAngleOffsetDeg = 0f;            // thử 90 / -90 / 180 nếu thấy lệch
     public bool invertX = false, invertY = false, swapXY = false;
 
+    [Header("Initial Direction")]
+    public Vector2 initialDirection = Vector2.right; // hướng mặc định của xe (phải)
+
     // --- runtime ---
     private Rigidbody2D rb;
     private InputAction moveAction;
     private Vector2 input;                           // input người chơi
     private Vector2 desiredVel;                      // vận tốc mục tiêu (sau accel/decel)
-    private Vector2 animDirSmooth = Vector2.up;      // vector hướng đưa vào Animator (mượt)
+    private Vector2 animDirSmooth;                   // vector hướng đưa vào Animator (mượt)
 
     void Awake()
     {
@@ -36,6 +39,10 @@ public class CarController2D : MonoBehaviour
         if (!animator) animator = GetComponentInChildren<Animator>();
         // KHÔNG xoay thân xe (để tránh bẻ sprite)
         rb.freezeRotation = true;
+        
+        // Khởi tạo hướng animation dựa trên hướng ban đầu của xe
+        animDirSmooth = initialDirection.normalized;
+        
         enabled = false; // bật khi BeginDrive()
     }
 
@@ -55,6 +62,16 @@ public class CarController2D : MonoBehaviour
         moveAction = playerInput.actions[moveActionName];
         moveAction?.Enable();
         enabled = true;
+        
+        // Khi bắt đầu lái xe, cập nhật animator với hướng hiện tại
+        if (animator)
+        {
+            // Áp dụng offset và transformations cho hướng hiện tại
+            Vector2 currentAnimDir = GetTransformedDirection(animDirSmooth);
+            animator.SetFloat("MoveX", currentAnimDir.x);
+            animator.SetFloat("MoveY", currentAnimDir.y);
+            animator.SetFloat("Speed", 0f);
+        }
     }
 
     public void EndDrive()
@@ -65,6 +82,23 @@ public class CarController2D : MonoBehaviour
         desiredVel = Vector2.zero;
         rb.linearVelocity = Vector2.zero;
         if (animator) animator.SetFloat("Speed", 0f);
+    }
+
+    // Hàm helper để áp dụng các transformation cho direction
+    private Vector2 GetTransformedDirection(Vector2 direction)
+    {
+        // Áp dụng angle offset
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + animAngleOffsetDeg;
+        Vector2 transformedDir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+        
+        // Áp dụng swap XY
+        if (swapXY) transformedDir = new Vector2(transformedDir.y, transformedDir.x);
+        
+        // Áp dụng invert
+        if (invertX) transformedDir.x = -transformedDir.x;
+        if (invertY) transformedDir.y = -transformedDir.y;
+        
+        return transformedDir.normalized;
     }
 
     void Update()
@@ -105,17 +139,14 @@ public class CarController2D : MonoBehaviour
         // quay mượt theo tốc độ độ/giây
         float newAng = Mathf.MoveTowardsAngle(curAng, tgtAng, animTurnSpeedDeg * Time.fixedDeltaTime);
 
-        // áp offset / đảo trục nếu cần
-        newAng += animAngleOffsetDeg;
-        Vector2 newDir = new Vector2(Mathf.Cos(newAng * Mathf.Deg2Rad), Mathf.Sin(newAng * Mathf.Deg2Rad));
-        if (swapXY) newDir = new Vector2(newDir.y, newDir.x);
-        if (invertX) newDir.x = -newDir.x;
-        if (invertY) newDir.y = -newDir.y;
+        // chuyển góc thành vector
+        animDirSmooth = new Vector2(Mathf.Cos(newAng * Mathf.Deg2Rad), Mathf.Sin(newAng * Mathf.Deg2Rad)).normalized;
 
-        animDirSmooth = newDir.normalized;
+        // áp dụng transformations cho animator
+        Vector2 finalAnimDir = GetTransformedDirection(animDirSmooth);
 
         // gửi vào BlendTree
-        animator.SetFloat("MoveX", animDirSmooth.x, animDamp, Time.deltaTime);
-        animator.SetFloat("MoveY", animDirSmooth.y, animDamp, Time.deltaTime);
+        animator.SetFloat("MoveX", finalAnimDir.x, animDamp, Time.deltaTime);
+        animator.SetFloat("MoveY", finalAnimDir.y, animDamp, Time.deltaTime);
     }
 }
