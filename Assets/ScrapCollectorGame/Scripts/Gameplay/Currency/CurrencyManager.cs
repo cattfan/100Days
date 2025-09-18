@@ -29,14 +29,7 @@ public class CurrencyManager : MonoBehaviour
         UpdateCoinText();
     }
 
-    void Update()
-    {
-        if (Keyboard.current != null && Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            AddCoins(1000);
-            Debug.Log("Đã thêm 1000 coins bằng phím T!");
-        }
-    }
+    
 
     public void AddCoins(int amount)
     {
