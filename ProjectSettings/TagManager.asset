@@ -10,6 +10,7 @@ TagManager:
   - NPC
   - Wall
   - Tilemap
+  - ShopItem
   layers:
   - Default
   - TransparentFX

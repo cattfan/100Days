@@ -1892,8 +1892,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10.917, y: -235}
-  m_SizeDelta: {x: 203.6748, y: 89.2728}
+  m_AnchoredPosition: {x: -0.0000023842, y: -239.2}
+  m_SizeDelta: {x: 332.1375, y: 89.2728}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &162231873
 MonoBehaviour:
@@ -1971,8 +1971,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 8951868453704295445, guid: 3b8c83f7d0c3f2c4e8d4bbbd5c359caf, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -11703,7 +11703,7 @@ GameObject:
   - component: {fileID: 225452405}
   m_Layer: 5
   m_Name: ShopOngTamUI
-  m_TagString: Untagged
+  m_TagString: ShopItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17091,7 +17091,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626ddf37e7d0b4646ab0d9316073fc12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcName: "\xD4ng T\xE1m"
+  npcName: "L\xE3o Tr\u1ECDc"
   nameDisplayText: {fileID: 1771068766}
   showNameOnStart: 0
   hideNameWhenFarAway: 1
@@ -21195,8 +21195,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 7, y: 2}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 3.5, y: 2}
+  m_SizeDelta: {x: -7, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1183185295
 MonoBehaviour:
@@ -21218,7 +21218,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Back
+  m_text: Back to Menu
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -99417,7 +99417,7 @@ GameObject:
   - component: {fileID: 1797387146}
   m_Layer: 5
   m_Name: ShopInventory
-  m_TagString: Untagged
+  m_TagString: ShopItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99806,7 +99806,7 @@ GameObject:
   - component: {fileID: 1845804519}
   m_Layer: 5
   m_Name: PlayerInventory
-  m_TagString: Untagged
+  m_TagString: ShopItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -128179,7 +128179,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "B\xE0 Hai"
+  m_text: "\xD4ng T\xE1m"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -128266,7 +128266,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1919909578}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -128274,8 +128274,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -921.27, y: -1076.72}
-  m_SizeDelta: {x: 1.6378, y: 0.5999}
+  m_AnchoredPosition: {x: -921.24, y: -1076.71}
+  m_SizeDelta: {x: 2.1731, y: 0.5999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1935705833
 GameObject:
@@ -307544,6 +307544,7 @@ MonoBehaviour:
   luongtheluchientai: 0
   luongtheluctoida: 100
   giamToc: 50
+  eatCooldown: 5
 --- !u!114 &2110757299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307844,7 +307845,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626ddf37e7d0b4646ab0d9316073fc12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcName: "B\xE0 Hai"
+  npcName: "\xD4ng T\xE1m"
   nameDisplayText: {fileID: 1919909579}
   showNameOnStart: 0
   hideNameWhenFarAway: 1
@@ -308793,13 +308794,29 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3372908933215910516, guid: 29e9c449eee292d419542fe988130f72, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3372908933215910516, guid: 29e9c449eee292d419542fe988130f72, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 3372908933215910516, guid: 29e9c449eee292d419542fe988130f72, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 10.917
+      value: 0.0000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 3372908933215910516, guid: 29e9c449eee292d419542fe988130f72, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -105
       objectReference: {fileID: 0}
+    - target: {fileID: 3881299725385611676, guid: 29e9c449eee292d419542fe988130f72, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3881299725385611676, guid: 29e9c449eee292d419542fe988130f72, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 8951868453704295445, guid: 3b8c83f7d0c3f2c4e8d4bbbd5c359caf, type: 3}
     - target: {fileID: 5440036424231931626, guid: 29e9c449eee292d419542fe988130f72, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

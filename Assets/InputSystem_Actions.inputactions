@@ -494,30 +494,8 @@
                 },
                 {
                     "name": "",
-                    "id": "66cad713-48e3-4077-94c5-fdda27265524",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "OpenMenu/Inventory",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "23888440-a065-4cd3-bc22-370ecfee0024",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Talk/InteractNPC",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6defc28a-d45d-4dff-99b9-c7b581f35abd",
-                    "path": "<Keyboard>/t",
+                    "id": "3b1d5391-dd99-40a5-86ab-9365fc587b76",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
