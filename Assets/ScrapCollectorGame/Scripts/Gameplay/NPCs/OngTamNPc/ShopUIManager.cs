@@ -115,11 +115,12 @@ public class ShopUIManager : MonoBehaviour
 
                     var dragHandler = itemClone.GetComponent<ItemDragHandler>();
                     if (dragHandler != null) Destroy(dragHandler);
-
+                    // ✅ VÔ HIỆU HÓA IPointerClickHandler (right-click để ăn)
                     var itemUIComponent = itemClone.GetComponent<ItemUI>();
                     if (itemUIComponent != null)
                     {
-                        itemClone.gameObject.tag = "ShopItem";
+                        // Thêm một flag để ItemUI biết là đang trong shop
+                        itemClone.gameObject.tag = "ShopItem"; // Hoặc dùng cách khác
                     }
 
                     slotClone.currentItem = itemClone.gameObject;

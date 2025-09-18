@@ -1,4 +1,4 @@
-{
+﻿{
     "version": 1,
     "name": "InputSystem_Actions",
     "maps": [
@@ -494,18 +494,7 @@
                 },
                 {
                     "name": "",
-                    "id": "66cad713-48e3-4077-94c5-fdda27265524",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "OpenMenu/Inventory",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "23888440-a065-4cd3-bc22-370ecfee0024",
+                    "id": "3b1d5391-dd99-40a5-86ab-9365fc587b76",
                     "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
