@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -32,6 +32,8 @@ public partial class Inventory : MonoBehaviour
         var saveController = FindFirstObjectByType<SaveController>();
         if (saveController == null || !saveController.HasSaveFile(saveController.GetPlayerName()))
         {
+            // Comment out or remove the starting items code
+            /*
             if (startItems != null && startItems.Length > 0)
             {
                 foreach (var data in startItems)
@@ -39,6 +41,7 @@ public partial class Inventory : MonoBehaviour
                     if (data != null) AddItem(data, 1);
                 }
             }
+            */
         }
     }
 
