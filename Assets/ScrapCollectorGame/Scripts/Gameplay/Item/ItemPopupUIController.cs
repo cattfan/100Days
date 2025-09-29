@@ -91,7 +91,6 @@ public class ItemPickupUIController : MonoBehaviour
             Destroy(removed);
         }
 
-        // Fade out and destroy
         StartCoroutine(FadeOutAndDestroy(newPopup));
     }
 
@@ -135,18 +134,14 @@ public class ItemPickupUIController : MonoBehaviour
             return;
         }
 
-        // 🗑️ Xóa hết các thông báo nhặt vật phẩm khi có warning
         ClearAllPickupPopups();
 
-        // Hủy thông báo warning cũ nếu có
         if (currentWarningPopup != null)
         {
             StopCoroutine(FadeOutAndDestroyWarning(currentWarningPopup, duration));
             Destroy(currentWarningPopup);
             currentWarningPopup = null;
         }
-
-        // Tạo thông báo mới
 
         GameObject newPopup = Instantiate(popupFullInventory, transform);
         if (newPopup == null)
@@ -163,7 +158,6 @@ public class ItemPickupUIController : MonoBehaviour
         currentWarningPopup = newPopup;
         currentWarningText = message;
 
-        // ⏳ Fade out sau thời gian quy định
         StartCoroutine(FadeOutAndDestroyWarning(newPopup, duration));
     }
 
@@ -175,7 +169,6 @@ public class ItemPickupUIController : MonoBehaviour
         CanvasGroup canvasGroup = popup.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
-            // Reset thông tin nếu đây là popup hiện tại
             if (popup == currentWarningPopup)
             {
                 currentWarningPopup = null;
@@ -212,6 +205,5 @@ public class ItemPickupUIController : MonoBehaviour
             }
         }
     }
-
 
 }

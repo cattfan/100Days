@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class MenuInventoryController : MonoBehaviour
 {
     public GameObject MenuCanvas;
-    public TabsController tabsController; // tham chiếu tới TabsController
+    public TabsController tabsController;
     private bool isInventoryOpen = false;
     private AudioManagement audioManagement;
 
@@ -30,8 +30,6 @@ public class MenuInventoryController : MonoBehaviour
         }
     }
 
-    // ========== LOGIC ==========
-
     private void ToggleInventory()
     {
         if (MenuCanvas == null) return;
@@ -41,10 +39,8 @@ public class MenuInventoryController : MonoBehaviour
 
         if (isInventoryOpen && tabsController != null)
         {
-            // Luôn mở Inventory tab đầu tiên
             tabsController.OpenInventoryTab();
         }
-        // Play sound
         if (audioManagement != null)
         {
             audioManagement.PlaySFX(audioManagement.OpenMenu);
@@ -61,10 +57,8 @@ public class MenuInventoryController : MonoBehaviour
 
         if (tabsController != null)
         {
-            // Đặt toàn bộ tab về inactive khi thoát
             tabsController.CloseTab();
         }
-        // Play sound
         if (audioManagement != null)
         {
             audioManagement.PlaySFX(audioManagement.CloseMenu);
