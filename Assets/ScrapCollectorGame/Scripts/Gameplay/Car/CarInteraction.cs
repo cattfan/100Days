@@ -5,11 +5,11 @@ using Unity.Cinemachine;
 public class CarInteraction : MonoBehaviour
 {
     [Header("Car ID")]
-    [SerializeField] private string carId; // Unique identifier for this car
+    [SerializeField] private string carId;
 
     [Header("UI")]
-    [SerializeField] private GameObject messageUI;       // "Bấm E để sử dụng phương tiện"
-    [SerializeField] private GameObject lockedMessageUI; // "Xe đang khóa"
+    [SerializeField] private GameObject messageUI;
+    [SerializeField] private GameObject lockedMessageUI;
 
     [Header("Car refs")]
     [SerializeField] private GameObject carRoot;
@@ -17,10 +17,12 @@ public class CarInteraction : MonoBehaviour
     [SerializeField] private Transform seatPoint;
     [SerializeField] private Transform exitPoint;
 
+    // <<< THAY ĐỔI 1: Tách biệt action vào xe và ra khỏi xe
     [Header("Input maps & actions")]
     [SerializeField] private string onFootMapName = "OnFoot";
     [SerializeField] private string vehicleMapName = "Vehicle";
-    [SerializeField] private string interactActionName = "Interact";
+    [SerializeField] private string interactActionName = "Interact"; // Dùng để RA KHỎI xe
+    [SerializeField] private string enterVehicleActionName = "EnterVehicle"; // Dùng để VÀO xe
 
     [Header("Camera (Cinemachine 3)")]
     [SerializeField] private CinemachineCamera vcam;
@@ -31,17 +33,17 @@ public class CarInteraction : MonoBehaviour
     [SerializeField] private float fallbackExitOffset = 0.8f;
 
     [Header("Smart Exit System V2")]
-    [SerializeField] private float playerRadius = 0.25f;           // giảm xuống để phù hợp hơn
-    [SerializeField] private float exitSearchRadius = 2.5f;       // vùng tìm kiếm
-    [SerializeField] private int exitSearchAttempts = 20;         // tăng số điểm kiểm tra
-    [SerializeField] private float minDistanceFromCar = 0.8f;     // giảm xuống để flexible hơn
-    [SerializeField] private bool useAllLayersCheck = true;       // kiểm tra tất cả layer
-    [SerializeField] private LayerMask specificObstacleLayers = -1; // nếu useAllLayersCheck = false
-    [SerializeField] private bool debugExitSystem = true;         // bật debug để xem
-    
+    [SerializeField] private float playerRadius = 0.25f;
+    [SerializeField] private float exitSearchRadius = 2.5f;
+    [SerializeField] private int exitSearchAttempts = 20;
+    [SerializeField] private float minDistanceFromCar = 0.8f;
+    [SerializeField] private bool useAllLayersCheck = true;
+    [SerializeField] private LayerMask specificObstacleLayers = -1;
+    [SerializeField] private bool debugExitSystem = true;
+
     [Header("Advanced Safety")]
-    [SerializeField] private string[] blockedTags = {"Wall", "Tilemap"}; // tags cần tránh
-    [SerializeField] private bool useSimpleCheck = true;          // dùng check đơn giản hơn
+    [SerializeField] private string[] blockedTags = { "Wall", "Tilemap" };
+    [SerializeField] private bool useSimpleCheck = true;
     [SerializeField] private float emergencyTeleportHeight = 1.5f;
 
     private GameObject player;
@@ -50,14 +52,12 @@ public class CarInteraction : MonoBehaviour
     private InputAction interactAction;
     private SpriteRenderer[] playerRenderers;
     private bool isPlayerNear, isInCar, isBusy;
-    private bool isUnlocked = false; // 🚧 mặc định khoá
+    private bool isUnlocked = false;
 
-    // Debug info
     private Vector3 lastAttemptedExitPos;
     private Vector3 lastSuccessfulExitPos;
     private string lastFailReason = "";
 
-    // Methods for save/load system
     public string GetCarId() => carId;
     public bool IsUnlocked() => isUnlocked;
 
@@ -91,7 +91,6 @@ public class CarInteraction : MonoBehaviour
 
     private void Awake()
     {
-        // Generate unique ID if not set
         if (string.IsNullOrEmpty(carId))
         {
             carId = gameObject.name + "_" + transform.position.ToString();
@@ -126,15 +125,38 @@ public class CarInteraction : MonoBehaviour
         if (interactAction != null) { interactAction.performed -= OnInteract; interactAction.Disable(); }
     }
 
+    // <<< THAY ĐỔI 2: Cập nhật lại toàn bộ hàm này
     private void RebindInteract()
     {
-        var a = playerInput.actions[interactActionName];
+        // Hủy đăng ký sự kiện cũ để tránh bị gọi nhiều lần
+        if (interactAction != null)
+        {
+            interactAction.performed -= OnInteract;
+        }
+
+        string actionToFind = "";
+
+        // Kiểm tra xem người chơi đang ở map nào
+        if (playerInput.currentActionMap.name == onFootMapName)
+        {
+            // Nếu đang đi bộ, tìm Action để VÀO XE
+            actionToFind = enterVehicleActionName;
+        }
+        else if (playerInput.currentActionMap.name == vehicleMapName)
+        {
+            // Nếu đang trong xe, tìm Action để RA KHỎI XE
+            actionToFind = interactActionName;
+        }
+
+        if (string.IsNullOrEmpty(actionToFind)) return;
+
+        var a = playerInput.actions[actionToFind];
         if (a == null)
         {
-            Debug.LogError($"[CarInteraction] Missing action '{interactActionName}'");
+            Debug.LogError($"[CarInteraction] Missing action '{actionToFind}'");
             return;
         }
-        if (interactAction != null) interactAction.performed -= OnInteract;
+
         interactAction = a;
         interactAction.Enable();
         interactAction.performed += OnInteract;
@@ -149,12 +171,12 @@ public class CarInteraction : MonoBehaviour
         {
             if (isUnlocked)
             {
-                if (messageUI) messageUI.SetActive(true);   // hiện "Bấm E để vào xe"
+                if (messageUI) messageUI.SetActive(true);
                 if (lockedMessageUI) lockedMessageUI.SetActive(false);
             }
             else
             {
-                if (lockedMessageUI) lockedMessageUI.SetActive(true); // hiện "Xe đang khóa"
+                if (lockedMessageUI) lockedMessageUI.SetActive(true);
                 if (messageUI) messageUI.SetActive(false);
             }
         }
@@ -196,7 +218,6 @@ public class CarInteraction : MonoBehaviour
         if (lockedMessageUI) lockedMessageUI.SetActive(false);
     }
 
-    // ===== Vào xe =====
     private System.Collections.IEnumerator EnterCarRoutine()
     {
         isBusy = true;
@@ -233,14 +254,12 @@ public class CarInteraction : MonoBehaviour
         isBusy = false;
     }
 
-    // ===== Thoát xe =====
     private System.Collections.IEnumerator ExitCarRoutine()
     {
         isBusy = true;
 
         if (carController != null) carController.EndDrive();
 
-        // Disable player physics temporarily
         var playerRb = player.GetComponent<Rigidbody2D>();
         bool wasPlayerKinematic = false;
         if (playerRb != null)
@@ -249,17 +268,15 @@ public class CarInteraction : MonoBehaviour
             playerRb.isKinematic = true;
         }
 
-        // Start ignoring collisions FIRST
         StartCoroutine(IgnoreCollisionBriefly());
-        yield return null; // wait 1 frame
+        yield return null;
 
-        // Find safe exit position with improved system
         Vector3 safeExitPos = FindSafeExitPositionV2();
         player.transform.position = safeExitPos;
 
         Debug.Log($"[CarInteraction] Exit position found: {safeExitPos}, Reason: {lastFailReason}");
 
-        yield return null; // wait another frame
+        yield return null;
 
         if (vcam && playerCameraTarget) vcam.Follow = playerCameraTarget;
 
@@ -279,7 +296,6 @@ public class CarInteraction : MonoBehaviour
 
         SetPlayerVisible(true);
 
-        // Restore player physics
         yield return new WaitForSeconds(0.1f);
         if (playerRb != null)
         {
@@ -292,15 +308,11 @@ public class CarInteraction : MonoBehaviour
         isBusy = false;
     }
 
-    /// <summary>
-    /// Version 2: Simplified but more effective
-    /// </summary>
     private Vector3 FindSafeExitPositionV2()
     {
         Vector3 carCenter = carRoot ? carRoot.transform.position : transform.position;
         lastFailReason = "";
 
-        // 1. Try exitPoint first (if configured)
         if (exitPoint != null)
         {
             if (IsPositionSafeV2(exitPoint.position, "exitPoint"))
@@ -311,21 +323,20 @@ public class CarInteraction : MonoBehaviour
             }
         }
 
-        // 2. Try immediate area around car (close positions first)
         float[] distances = { minDistanceFromCar, minDistanceFromCar * 1.5f, exitSearchRadius };
-        
+
         foreach (float distance in distances)
         {
             for (int i = 0; i < exitSearchAttempts; i++)
             {
                 float angle = (360f / exitSearchAttempts) * i;
                 float rad = angle * Mathf.Deg2Rad;
-                
+
                 Vector3 direction = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0);
                 Vector3 testPos = carCenter + direction * distance;
-                
+
                 lastAttemptedExitPos = testPos;
-                
+
                 if (IsPositionSafeV2(testPos, $"radial_dist{distance:F1}_angle{angle:F0}"))
                 {
                     lastSuccessfulExitPos = testPos;
@@ -335,9 +346,8 @@ public class CarInteraction : MonoBehaviour
             }
         }
 
-        // 3. Try cardinal directions at increasing distances
         Vector3[] cardinalDirections = { Vector3.right, Vector3.left, Vector3.up, Vector3.down };
-        
+
         for (float dist = 0.5f; dist <= exitSearchRadius * 1.5f; dist += 0.3f)
         {
             foreach (var direction in cardinalDirections)
@@ -352,7 +362,6 @@ public class CarInteraction : MonoBehaviour
             }
         }
 
-        // 4. Emergency positions (high up)
         Vector3[] emergencyPositions = {
             carCenter + Vector3.up * emergencyTeleportHeight,
             carCenter + Vector3.up * emergencyTeleportHeight + Vector3.right * 0.5f,
@@ -370,7 +379,6 @@ public class CarInteraction : MonoBehaviour
             }
         }
 
-        // 5. Ultimate fallback - just move slightly away from car
         Vector3 ultimatePos = carCenter + Vector3.right * 0.6f;
         lastSuccessfulExitPos = ultimatePos;
         lastFailReason = "Ultimate fallback - no safe position found";
@@ -378,12 +386,8 @@ public class CarInteraction : MonoBehaviour
         return ultimatePos;
     }
 
-    /// <summary>
-    /// Simplified safety check with better debugging
-    /// </summary>
     private bool IsPositionSafeV2(Vector3 position, string checkReason)
     {
-        // Skip minimum distance check for emergency positions
         if (!checkReason.Contains("emergency"))
         {
             Vector3 carCenter = carRoot ? carRoot.transform.position : transform.position;
@@ -406,21 +410,16 @@ public class CarInteraction : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Simple check - just avoid tagged objects
-    /// </summary>
     private bool IsPositionSafeSimple(Vector3 position, string checkReason)
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(position, playerRadius);
-        
+
         foreach (var hit in hits)
         {
             if (hit == null) continue;
 
-            // Skip player collider
             if (hit.CompareTag("Player")) continue;
 
-            // Skip car colliders
             if (carRoot != null && (hit.transform.IsChildOf(carRoot.transform) || hit.transform == carRoot.transform))
             {
                 if (debugExitSystem)
@@ -428,7 +427,6 @@ public class CarInteraction : MonoBehaviour
                 return false;
             }
 
-            // Check blocked tags
             foreach (string blockedTag in blockedTags)
             {
                 if (hit.CompareTag(blockedTag))
@@ -439,10 +437,8 @@ public class CarInteraction : MonoBehaviour
                 }
             }
 
-            // If useAllLayersCheck is true, any other collider is considered blocking
             if (useAllLayersCheck)
             {
-                // Allow triggers to pass through
                 if (!hit.isTrigger)
                 {
                     if (debugExitSystem)
@@ -457,20 +453,15 @@ public class CarInteraction : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// Complex check using LayerMask
-    /// </summary>
     private bool IsPositionSafeComplex(Vector3 position, string checkReason)
     {
         Collider2D hit = Physics2D.OverlapCircle(position, playerRadius, specificObstacleLayers);
-        
+
         if (hit == null) return true;
 
-        // Skip car colliders
         if (carRoot != null && (hit.transform.IsChildOf(carRoot.transform) || hit.transform == carRoot.transform))
             return false;
 
-        // Skip player collider
         if (hit.CompareTag("Player"))
             return true;
 
@@ -485,15 +476,13 @@ public class CarInteraction : MonoBehaviour
         if (playerCol == null) yield break;
 
         var carCols = carRoot ? carRoot.GetComponentsInChildren<Collider2D>() : new Collider2D[0];
-        
-        // Ignore collisions
-        foreach (var c in carCols) 
+
+        foreach (var c in carCols)
             if (c) Physics2D.IgnoreCollision(playerCol, c, true);
-        
+
         yield return new WaitForSeconds(ignoreCollisionSeconds);
-        
-        // Re-enable collisions
-        foreach (var c in carCols) 
+
+        foreach (var c in carCols)
             if (c) Physics2D.IgnoreCollision(playerCol, c, false);
     }
 
@@ -512,16 +501,13 @@ public class CarInteraction : MonoBehaviour
         if (debugExitSystem)
         {
             Vector3 carCenter = carRoot ? carRoot.transform.position : transform.position;
-            
-            // Draw minimum distance circle
+
             Gizmos.color = Color.red;
             DrawCircle(carCenter, minDistanceFromCar);
-            
-            // Draw search radius
+
             Gizmos.color = Color.blue;
             DrawCircle(carCenter, exitSearchRadius);
-            
-            // Draw test positions in realtime
+
             if (Application.isPlaying)
             {
                 for (int i = 0; i < exitSearchAttempts; i++)
@@ -530,19 +516,17 @@ public class CarInteraction : MonoBehaviour
                     float rad = angle * Mathf.Deg2Rad;
                     Vector3 direction = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0);
                     Vector3 testPos = carCenter + direction * exitSearchRadius;
-                    
+
                     Gizmos.color = IsPositionSafeV2(testPos, "gizmo_test") ? Color.green : Color.red;
                     Gizmos.DrawWireSphere(testPos, playerRadius);
                 }
             }
-            
-            // Draw last successful exit position
+
             if (lastSuccessfulExitPos != Vector3.zero)
             {
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawSphere(lastSuccessfulExitPos, playerRadius);
-                
-                // Draw line from car to exit
+
                 Gizmos.color = Color.white;
                 Gizmos.DrawLine(carCenter, lastSuccessfulExitPos);
             }

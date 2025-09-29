@@ -29,7 +29,14 @@ public class CurrencyManager : MonoBehaviour
         UpdateCoinText();
     }
 
-    
+    void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.f3Key.wasPressedThisFrame)
+        {
+            AddCoins(1000);
+            Debug.Log("F3 pressed! Added 1000 coins. Current coins: " + coins);
+        }
+    }
 
     public void AddCoins(int amount)
     {

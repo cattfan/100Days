@@ -5,12 +5,11 @@ public class ThanhTheLucplayer : MonoBehaviour
     public ThanhTheLuc thanhtheluc;
     public float luongtheluchientai;
     public float luongtheluctoida = 100;
-    private float targetTheLuc;      // mục tiêu cần giảm về
-    public float giamToc = 50f;      // tốc độ giảm (điều chỉnh cho mượt)
+    private float targetTheLuc;
+    public float giamToc = 50f;
 
-    // 🌟 Thêm biến hồi chiêu
     private float lastEatTime = -Mathf.Infinity;
-    public float eatCooldown = 5f;   // 5 giây giữa hai lần ăn
+    public float eatCooldown = 5f;
 
     void Start()
     {
@@ -28,33 +27,24 @@ public class ThanhTheLucplayer : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Thử ăn đồ để hồi thể lực, trả về true nếu thành công.
-    /// Kiểm tra đầy thể lực và hồi chiêu 5 giây.
-    /// </summary>
     public bool TryEat(float restoreAmount)
     {
-        // Kiểm tra hồi chiêu
         if (Time.time - lastEatTime < eatCooldown)
         {
             ItemPickupUIController.Instance?.ShowWarningPopup("Bạn cần chờ thêm trước khi ăn tiếp!", 2f);
             return false;
         }
 
-        // Kiểm tra đầy thể lực
         if (luongtheluchientai >= luongtheluctoida - 0.01f)
         {
             ItemPickupUIController.Instance?.ShowWarningPopup("Thể lực đã đầy, không thể ăn thêm!", 2f);
             return false;
         }
 
-        // Hồi thể lực
         AddEnergy(restoreAmount);
         lastEatTime = Time.time;
         return true;
     }
-
-    // ================== Các hàm cũ giữ nguyên ===================
 
     public void TruTheLuc(float amount)
     {
