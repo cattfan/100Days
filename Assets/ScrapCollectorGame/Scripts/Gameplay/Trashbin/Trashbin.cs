@@ -17,9 +17,9 @@ namespace Trashbin
         public GameObject itemPickupPrefab;
 
         [Header("Spawn Settings")]
-        public float spawnChance = 0.8f;
-        public int minItems = 1;
-        public int maxItems = 3;
+        public float spawnChance = 1f;
+        public int minItems = 3;
+        public int maxItems = 5;
         public float spawnRadius = 1.5f;
         public Vector3 spawnOffset = Vector3.down;
 
