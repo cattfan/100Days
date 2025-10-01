@@ -39,6 +39,20 @@ namespace NumberInputSystem
 
         private PlayerInput playerInput;
 
+        // ✅ Hàm random chữ số cho từng vị trí (giới hạn 0-200)
+        private int GetRandomDigitForPosition(int position, int totalDigits)
+        {
+            if (position == 0 && totalDigits == 3)
+            {
+                // Chữ số đầu tiên chỉ từ 0-1 (cho số 0-199)
+                return Random.Range(0, 2);
+            }
+            else
+            {
+                // Các chữ số còn lại từ 0-9
+                return Random.Range(0, 10);
+            }
+        }
 
         public void StartGacha()
         {
@@ -57,24 +71,27 @@ namespace NumberInputSystem
             for (int i = 0; i < gachaTexts.Count; i++)
             {
                 if (gachaTexts[i] != null)
-                    StartCoroutine(RollSlot(gachaTexts[i]));
+                    StartCoroutine(RollSlot(gachaTexts[i], i));
             }
         }
 
-        IEnumerator RollSlot(TextMeshProUGUI textObj)
+        IEnumerator RollSlot(TextMeshProUGUI textObj, int slotIndex)
         {
             float elapsed = 0f;
+            int totalDigits = playerNumbers.Length;
+
             while (elapsed < rollDuration)
             {
                 elapsed += rollSpeed;
-                int randomNum = Random.Range(0, maxDigit + 1);
-                textObj.text = randomNum.ToString();
+                // ✅ Random chữ số phù hợp với vị trí (0-1 cho vị trí đầu, 0-9 cho các vị trí khác)
+                int randomDigit = GetRandomDigitForPosition(slotIndex, totalDigits);
+                textObj.text = randomDigit.ToString();
                 yield return new WaitForSeconds(rollSpeed);
             }
 
-            // Chốt số cuối cùng
-            int finalNum = Random.Range(0, maxDigit + 1);
-            textObj.text = finalNum.ToString();
+            // ✅ Chốt số cuối cùng theo quy tắc giới hạn
+            int finalDigit = GetRandomDigitForPosition(slotIndex, totalDigits);
+            textObj.text = finalDigit.ToString();
             slotsFinished++;
 
             // Khi tất cả slot đã dừng
